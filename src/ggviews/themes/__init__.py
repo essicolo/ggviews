@@ -5,6 +5,6 @@ This module provides theming functionality, similar to ggplot2's theme_* functio
 """
 
 from .base import Theme
-from .presets import theme_default, theme_minimal, theme_bw
+from .presets import theme_default, theme_minimal, theme_bw, theme_ggplot2
 
-__all__ = ["Theme", "theme_default", "theme_minimal", "theme_bw"]
+__all__ = ["Theme", "theme_default", "theme_minimal", "theme_bw", "theme_ggplot2"]

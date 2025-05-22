@@ -37,7 +37,7 @@ from .geoms.density import GeomDensity
 from .scales import scale_x_log10, scale_y_log10
 
 # Import themes
-from .themes import theme_default, theme_minimal, theme_bw
+from .themes import theme_default, theme_minimal, theme_bw, theme_ggplot2
 
 # Import facets
 from .facets import facet_grid, facet_wrap
@@ -115,6 +115,10 @@ def scale_color_continuous(*args, **kwargs):
 
 def scale_color_discrete(*args, **kwargs):
     from .scales.color import scale_color_discrete
+    # If no palette is specified, use ggplot2 palette by default
+    if 'palette' not in kwargs:
+        from .themes.presets import ggplot2_color_palette
+        kwargs['palette'] = ggplot2_color_palette()
     return scale_color_discrete(*args, **kwargs)
 
 def scale_fill_continuous(*args, **kwargs):
@@ -123,6 +127,10 @@ def scale_fill_continuous(*args, **kwargs):
 
 def scale_fill_discrete(*args, **kwargs):
     from .scales.color import scale_fill_discrete
+    # If no palette is specified, use ggplot2 palette by default
+    if 'palette' not in kwargs:
+        from .themes.presets import ggplot2_fill_palette
+        kwargs['palette'] = ggplot2_fill_palette()
     return scale_fill_discrete(*args, **kwargs)
 
 # Add scale methods
@@ -149,6 +157,7 @@ def _add_theme_method(name, theme_func):
 _add_theme_method('theme_default', theme_default)
 _add_theme_method('theme_minimal', theme_minimal)
 _add_theme_method('theme_bw', theme_bw)
+_add_theme_method('theme_ggplot2', theme_ggplot2)
 
 
 # Add facet methods
@@ -205,6 +214,7 @@ __all__ = [
     'theme_default',
     'theme_minimal',
     'theme_bw',
+    'theme_ggplot2',
     'facet_grid',
     'facet_wrap',
     'coord_flip',

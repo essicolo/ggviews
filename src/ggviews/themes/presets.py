@@ -68,8 +68,6 @@ def theme_minimal() -> Theme:
         'gridstyle': {'grid_line_color': '#EDEDED', 'grid_line_width': 0.5},
         # Axes
         'show_grid': True,
-        'xaxis': {'axis_line_width': 0},
-        'yaxis': {'axis_line_width': 0},
         # Legend
         'show_legend': True,
         'legend_position': 'right',
@@ -105,11 +103,58 @@ def theme_bw() -> Theme:
         'gridstyle': {'grid_line_color': 'white', 'grid_line_width': 1},
         # Axes
         'show_grid': True,
-        'xaxis': {'axis_line_color': 'black', 'axis_line_width': 1},
-        'yaxis': {'axis_line_color': 'black', 'axis_line_width': 1},
         # Legend
         'show_legend': True,
         'legend_position': 'right',
     }
     
     return Theme("bw", opts)
+
+def ggplot2_color_palette():
+    # ggplot2's default discrete color palette (hue)
+    return [
+        '#F8766D', # red
+        '#7CAE00', # green
+        '#00BFC4', # cyan
+        '#C77CFF', # purple
+        '#FF61C3', # pink
+        '#00BA38', # dark green
+        '#619CFF', # blue
+        '#FFB300', # orange
+    ]
+
+def ggplot2_fill_palette():
+    # Same as color palette for most geoms
+    return ggplot2_color_palette()
+
+def theme_ggplot2() -> Theme:
+    """A theme inspired by ggplot2's default look in R.
+    Includes background, grid, axis, and legend styling, and uses ggplot2's default color palette.
+    Note: Color palette is provided for use in geoms/scales, but not all elements may use it automatically.
+    Returns
+    -------
+    Theme
+        A ggplot2-like theme.
+    """
+    opts = {
+        # Panel background
+        'bgcolor': '#EBEBEB',
+        'width': 600,
+        'height': 400,
+        # Panel border (supported)
+        'border_line_color': 'black',
+        'border_line_width': 1.0,
+        # Major grid lines
+        'gridstyle': {
+            'grid_line_color': 'white',
+            'grid_line_width': 1.1,
+            'grid_line_dash': 'solid',
+        },
+        # Axes
+        'show_grid': True,
+        # Legend
+        'show_legend': True,
+        'legend_position': 'right',
+        # Note: ggplot2_palette is available as a function for use in geoms/scales, not as a theme option
+    }
+    return Theme("ggplot2", opts)

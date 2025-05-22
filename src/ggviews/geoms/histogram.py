@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from .base import Layer, Aesthetics, is_valid_dimension_name
 from typing import Optional
 import holoviews as hv
@@ -66,10 +67,8 @@ class GeomHistogram(Layer):
         if x not in data.columns:
             raise ValueError(f"Column '{x}' not found in data. Available columns: {list(data.columns)}")
 
-        # Get additional aesthetics for the histogram
-        opts = {
-            'bins': self.bins
-        }
+        # Prepare options for styling the histogram
+        opts = {}
 
         # Add color, fill, etc.
         if 'fill' in mappings:
@@ -97,9 +96,11 @@ class GeomHistogram(Layer):
                 warnings.warn(f"Column-based alpha mapping '{alpha_val}' not supported for histograms. Using a fixed alpha.")
             opts['alpha'] = alpha_val
 
-        # Create the histogram with the data column
-        hist_data = data[x].dropna()
-        hist = hv.Histogram(hist_data, bins=self.bins)
+        # Create the histogram by computing bin counts
+        hist_data = data[x].dropna().values
+        counts, edges = np.histogram(hist_data, bins=self.bins)
+        # edges has length bins+1; HoloViews expects (edges, counts)
+        hist = hv.Histogram((edges, counts))
 
         # Apply options if any were set
         if opts:

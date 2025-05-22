@@ -24,16 +24,23 @@ class Theme:
         self.opts = opts
     
     def apply(self, plot: hv.Element) -> hv.Element:
-        """Apply the theme to a plot element.
-        
-        Parameters
-        ----------
-        plot : hv.Element
-            The plot element to apply the theme to.
-        
-        Returns
-        -------
-        hv.Element
-            The plot element with the theme applied.
-        """
-        return plot.opts(**self.opts)
+        """Apply the theme to a plot element, dropping any options unsupported by that element."""
+        import re, warnings
+        opts = dict(self.opts)
+        # Attempt to apply all options, removing any that raise a ValueError
+        while opts:
+            try:
+                return plot.opts(**opts)
+            except ValueError as e:
+                msg = str(e)
+                # Look for unsupported option name
+                m = re.search(r"Unexpected option '(.+?)'", msg)
+                if m:
+                    bad_opt = m.group(1)
+                    warnings.warn(f"Theme '{self.name}' option '{bad_opt}' not supported by this element; dropping it.")
+                    opts.pop(bad_opt, None)
+                    continue
+                # If we can't parse the error, re-raise
+                raise
+        # No options left or none applied
+        return plot

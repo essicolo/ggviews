@@ -7,7 +7,7 @@ This example shows how to create various types of plots with ggviews.
 # %%
 from ggviews import ggplot, aes, load_dataset
 mtcars = load_dataset('mtcars')
-ggplot(mtcars, aes(x='wt', y='mpg')).geom_point(aes(color='cyl'), size=5, alpha=0.7)
+ggplot(mtcars, aes(x='wt', y='mpg')).geom_point(aes(color='cyl'), size=5, alpha=0.7).theme_ggplot2()
 
 # %%
 from ggviews import ggplot, aes, load_dataset
@@ -22,9 +22,8 @@ mtcars = load_dataset('mtcars')
         x='Horsepower (log scale)',
         y='Quarter Mile Time (s)'
     )
+    .theme_ggplot2()
 )
-    
-
 # %%
 from ggviews import ggplot, aes, load_dataset
 mtcars = load_dataset('mtcars')
@@ -40,10 +39,11 @@ gear_mpg = mtcars.groupby('gear')['mpg'].mean().reset_index()
 )
 
 # %%
+from ggviews import ggplot, aes, load_dataset
 diamonds = load_dataset('diamonds')
 (
     ggplot(diamonds, aes(x='price'))
-    .geom_histogram(bins=50, fill='steelblue', color='black')
+    .geom_histogram(bins=50, fill='pink', color='black')
     .labs(
         title='Distribution of Diamond Prices',
         x='Price ($)',
@@ -53,11 +53,62 @@ diamonds = load_dataset('diamonds')
 )
 
 # %%
+import holoviews as hv
+diamonds = load_dataset('diamonds')
+
+hv.Scatter(
+    diamonds.sample(500),
+    kdims=['carat'],
+    vdims=['price', 'cut', 'color'],
+    label='Diamonds'
+).groupby('cut').layout()
+
+# %%
+import holoviews as hv
+diamonds = load_dataset('diamonds')
+hv.Scatter(
+    diamonds.sample(500),
+    kdims=['carat'],
+    vdims=['price', 'cut', 'color'],
+    label='Diamonds'
+).groupby(['cut', 'color']).layout()
+
+# %%
+from ggviews import ggplot, aes, load_dataset
+diamonds = load_dataset('diamonds')
+(
+    ggplot(diamonds.sample(500), aes(x='price', y='carat'))
+    .geom_point()
+    .facet_wrap('cut')
+)
+
+# %%
+from ggviews import ggplot, aes, load_dataset
+diamonds = load_dataset('diamonds')
+(
+    ggplot(diamonds.sample(500), aes(x='price'))
+    .geom_histogram(bins=50, fill='pink', color='black')
+    .facet_wrap('cut', scales='free')
+)
+
+# %%
+from ggviews import ggplot, aes, load_dataset
+diamonds = load_dataset('diamonds')
+(
+    ggplot(diamonds.sample(500), aes(x='price', y='carat'))
+    .geom_point()
+    .facet_grid(row='cut', col='color')
+)
+
+
+# %%
+import pandas as pd
+from ggviews import ggplot, aes, load_dataset
 economics = load_dataset('economics')
 economics['year'] = pd.to_datetime(economics['date']).dt.year
 (
-    ggplot(economics, aes(x='year', y='unemploy/pop'))
-    .geom_line(color='blue', linewidth=1.5)
+    ggplot(economics, aes(x='year', y='unemploy'))
+    .geom_line(color='blue', size=1.5)
     .geom_point(color='red', size=3)
     .labs(
         title='US Unemployment Rate Over Time',
@@ -66,3 +117,4 @@ economics['year'] = pd.to_datetime(economics['date']).dt.year
     )
     .theme_bw()
 )
+# %%

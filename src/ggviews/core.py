@@ -12,9 +12,15 @@ import numpy as np
 from typing import Dict, List, Optional, Union, Any, Tuple, Type, Callable
 
 from .aes import Aesthetics, aes
+from .facets.wrap import facet_wrap as _facet_wrap
 
 
 class GGPlot:
+    def _store_for_faceting(self, plot):
+        # Attach layers and mapping to the plot element for faceting
+        plot._gv_layers = self.layers
+        plot._gv_mapping = self.mapping
+        return plot
     """Main class for creating plots using the grammar of graphics.
     
     Parameters
@@ -94,6 +100,11 @@ class GGPlot:
         """
         self.facets = facet
         return self
+    
+    def facet_wrap(self, facets, nrow=None, ncol=None, scales='fixed') -> GGPlot:
+        """Shorthand to apply wrap faceting by passing directly facet variables."""
+        # Use ggviews.facet_wrap to construct a FacetWrap and set it
+        return self.facet(_facet_wrap(facets=facets, nrow=nrow, ncol=ncol, scales=scales))
     
     def coord(self, coord) -> GGPlot:
         """Set the coordinate system for the plot.
@@ -194,6 +205,9 @@ class GGPlot:
         
         # Apply faceting
         if self.facets:
+            # Provide original DataFrame to Facet object for use in apply
+            setattr(self.facets, '_data', self.data)
+            plot = self._store_for_faceting(plot)
             plot = self.facets.apply(plot)
         
         # Apply coordinate system
