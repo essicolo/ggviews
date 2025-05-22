@@ -17,12 +17,20 @@ diamonds = load_dataset('diamonds')
 ## Features
 
 - Method chaining for building complex plots (similar to ggplot2 syntax)
-- Support for different geometries (points, lines, bars, histograms)
+- Support for different geometries:
+  - Basic: points, lines, bars, histograms
+  - Statistical: boxplots, violin plots, density plots
 - Aesthetic mappings (color, size, shape, etc.)
-- Scales (log scales, discrete scales, continuous scales)
+- Scales:
+  - Continuous and discrete scales
+  - Log scales
+  - Color scales (continuous and discrete)
 - Themes (default, minimal, black-and-white)
 - Faceting (grid, wrap)
-- Coordinate systems (Cartesian, Polar)
+- Coordinate systems:
+  - Cartesian
+  - Polar
+  - Flipped coordinates
 - Labels and annotations
 
 ## Requirements
@@ -36,7 +44,18 @@ diamonds = load_dataset('diamonds')
 
 ## Changelog
 
-### Version 0.2.0 (May 22, 2025)
+### Version 0.3.0 (May 22, 2025)
+
+- Refactored codebase to use a modular file structure
+- Split classes into separate files for better maintainability
+- Added new geometries: `geom_boxplot`, `geom_violin`, `geom_density`
+- Added new coordinate systems: `coord_flip`, `coord_polar`
+- Added new color scales: `scale_color_continuous`, `scale_color_discrete`, `scale_fill_continuous`, `scale_fill_discrete`
+- Fixed inheritance issues in geometry classes
+- Improved method chaining API
+- Added comprehensive examples and tests
+
+### Version 0.2.0 (April 15, 2025)
 
 - Added faceting functionality with `facet_grid` and `facet_wrap`
 - Fixed dimension error when using numeric aesthetic mappings with `geom_point`, `geom_line`, and `geom_bar`
@@ -98,6 +117,54 @@ gear_mpg = mtcars.groupby('gear')['mpg'].mean().reset_index()
 )
 ```
 
+### Box Plot
+
+```python
+from ggviews import ggplot, aes, load_dataset
+mtcars = load_dataset('mtcars')
+(ggplot(mtcars, aes(x='cyl', y='mpg', fill='cyl'))
+    .geom_boxplot()
+    .labs(
+        title='MPG Distribution by Cylinder Count',
+        x='Number of Cylinders',
+        y='Miles per Gallon'
+    )
+    .theme_minimal()
+)
+```
+
+### Violin Plot
+
+```python
+from ggviews import ggplot, aes, load_dataset
+mtcars = load_dataset('mtcars')
+(ggplot(mtcars, aes(x='cyl', y='mpg', fill='cyl'))
+    .geom_violin()
+    .labs(
+        title='MPG Distribution by Cylinder Count',
+        x='Number of Cylinders',
+        y='Miles per Gallon'
+    )
+    .theme_minimal()
+)
+```
+
+### Density Plot
+
+```python
+from ggviews import ggplot, aes, load_dataset
+diamonds = load_dataset('diamonds')
+(ggplot(diamonds, aes(x='price', fill='cut'))
+    .geom_density(alpha=0.5)
+    .labs(
+        title='Diamond Price Distribution by Cut',
+        x='Price ($)',
+        y='Density'
+    )
+    .theme_minimal()
+)
+```
+
 ### Histogram
 
 ```python
@@ -150,6 +217,41 @@ mpg = load_dataset('mpg')
 )
 ```
 
+### Coordinate Flip
+
+```python
+from ggviews import ggplot, aes, load_dataset, coord_flip
+mtcars = load_dataset('mtcars')
+(ggplot(mtcars, aes(x='cyl', y='mpg', fill='cyl'))
+    .geom_boxplot()
+    .coord_flip()
+    .labs(
+        title='MPG Distribution by Cylinder Count',
+        x='Number of Cylinders',
+        y='Miles per Gallon'
+    )
+    .theme_minimal()
+)
+```
+
+### Polar Coordinates
+
+```python
+from ggviews import ggplot, aes, load_dataset, coord_polar
+mtcars = load_dataset('mtcars')
+gear_mpg = mtcars.groupby('gear')['mpg'].mean().reset_index()
+(ggplot(gear_mpg, aes(x='gear', y='mpg', fill='gear'))
+    .geom_bar(stat='identity')
+    .coord_polar()
+    .labs(
+        title='Average MPG by Number of Gears',
+        x='Number of Gears',
+        y='Average Miles per Gallon'
+    )
+    .theme_minimal()
+)
+```
+
 ### Facet Wrap
 
 ```python
@@ -175,16 +277,38 @@ ggviews is organized in a modular fashion with the following structure:
 src/
   ggviews/
     coords/        # Coordinate systems
+      base.py      # Base coordinate class
+      cartesian.py # Cartesian coordinates
+      flip.py      # Flipped coordinates
+      polar.py     # Polar coordinates
     facets/        # Faceting
+      base.py      # Base facet class
+      grid.py      # Grid faceting
+      wrap.py      # Wrap faceting
     geoms/         # Geometric objects
+      base.py      # Base geometry class
+      point.py     # Point geometry
+      line.py      # Line geometry
+      bar.py       # Bar geometry
+      histogram.py # Histogram geometry
+      boxplot.py   # Box plot geometry
+      violin.py    # Violin plot geometry
+      density.py   # Density plot geometry
     legends/       # Legend handling
     scales/        # Scale transformations
+      base.py      # Base scale class
+      continuous.py # Continuous scales
+      discrete.py  # Discrete scales
+      log.py       # Log scales
+      color.py     # Color scales
     stats/         # Statistical transformations
     themes/        # Visual themes
+      base.py      # Base theme class
+      presets.py   # Preset themes
     utils/         # Utility functions
     __init__.py    # Package initialization
-    aes.py         # Aesthetic mappings
-    core.py        # Core functionality
+    aesthetics.py  # Aesthetic mappings
+    ggplot.py      # GGPlot class
     data_loader.py # Data loading utilities
 ```
 
