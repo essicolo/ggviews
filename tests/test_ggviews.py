@@ -38,3 +38,18 @@ class TestCoordinateSystems:
         assert p.coord_system is not None
         assert hasattr(p.coord_system, '_apply')
 
+    def test_chaining_coord_fixed(self, sample_data):
+        """Test chaining coord_fixed method"""
+        p = ggplot(sample_data, aes(x='x', y='y')).geom_point().coord_fixed()
+        assert p.coord_system is not None
+        assert p.coord_system.ratio == 1
+    
+    def test_chaining_coord_equal(self, sample_data):
+        """Test chaining coord_equal method"""
+        p = ggplot(sample_data, aes(x='x', y='y')).geom_point().coord_equal()
+        assert p.coord_system is not None
+        assert p.coord_system.ratio == 1
+
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])
