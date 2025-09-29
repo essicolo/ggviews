@@ -19,6 +19,8 @@ from .themes import *
 from .scales import *
 from .facets import *
 from .coords import *
+from .viridis import *
+from .advanced_themes import *
 
 __version__ = "0.1.0"
 __author__ = "ggviews team"
@@ -46,6 +48,12 @@ __all__ = [
     'theme_bw',
     'theme_dark',
     'theme_void',
+    # Advanced theme elements
+    'element_blank',
+    'element_text',
+    'element_line', 
+    'element_rect',
+    'theme',
     # Scales
     'scale_color_manual',
     'scale_color_discrete',
@@ -54,6 +62,16 @@ __all__ = [
     'scale_y_continuous',
     'scale_x_discrete',
     'scale_y_discrete',
+    # Viridis scales
+    'scale_colour_viridis_c',
+    'scale_colour_viridis_d',
+    'scale_color_viridis_c', 
+    'scale_color_viridis_d',
+    'scale_colour_viridis',
+    'scale_color_viridis',
+    'scale_fill_viridis_c',
+    'scale_fill_viridis_d',
+    'scale_fill_viridis',
     # Facets
     'facet_wrap',
     'facet_grid',
