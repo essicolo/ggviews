@@ -354,3 +354,28 @@ class ggplot:
         """Apply coordinate transformation"""
         from .coords import coord_trans
         return coord_trans(x=x, y=y, **kwargs)._add_to_ggplot(self)
+    
+    # Method chaining for advanced scales
+    def scale_colour_viridis_c(self, **kwargs):
+        """Apply continuous viridis color scale"""
+        from .viridis import scale_colour_viridis_c
+        return scale_colour_viridis_c(**kwargs)._add_to_ggplot(self)
+    
+    def scale_colour_viridis_d(self, **kwargs):
+        """Apply discrete viridis color scale"""
+        from .viridis import scale_colour_viridis_d
+        return scale_colour_viridis_d(**kwargs)._add_to_ggplot(self)
+    
+    def scale_color_viridis_c(self, **kwargs):
+        """Apply continuous viridis color scale (American spelling)"""
+        return self.scale_colour_viridis_c(**kwargs)
+    
+    def scale_color_viridis_d(self, **kwargs):
+        """Apply discrete viridis color scale (American spelling)"""
+        return self.scale_colour_viridis_d(**kwargs)
+    
+    # Advanced theme support
+    def theme(self, **kwargs):
+        """Apply advanced theme with element-level control"""
+        from .advanced_themes import theme
+        return theme(**kwargs)._add_to_ggplot(self)
