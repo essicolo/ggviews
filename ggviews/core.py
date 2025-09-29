@@ -91,6 +91,7 @@ class ggplot:
         self.scales = {}
         self.theme = None
         self.facets = None
+        self.coord_system = None  # Add coordinate system support
         self.labels = {}
         self.limits = {}
         
