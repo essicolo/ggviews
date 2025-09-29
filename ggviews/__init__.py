@@ -20,7 +20,7 @@ from .scales import *
 from .facets import *
 from .coords import *
 from .viridis import *
-from .advanced_themes import *
+from .advanced_themes import element_blank, element_text, element_line, element_rect, AdvancedTheme
 
 __version__ = "0.1.0"
 __author__ = "ggviews team"
@@ -53,7 +53,7 @@ __all__ = [
     'element_text',
     'element_line', 
     'element_rect',
-    'theme',
+    'AdvancedTheme',
     # Scales
     'scale_color_manual',
     'scale_color_discrete',
