@@ -129,6 +129,7 @@ class ggplot:
         new_plot.scales = self.scales.copy()
         new_plot.theme = self.theme
         new_plot.facets = self.facets
+        new_plot.coord_system = self.coord_system  # Copy coordinate system
         new_plot.labels = self.labels.copy()
         new_plot.limits = self.limits.copy()
         return new_plot
