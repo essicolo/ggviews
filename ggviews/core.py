@@ -291,6 +291,32 @@ class ggplot:
         from .geoms import geom_area
         return geom_area(mapping=mapping, **kwargs)._add_to_ggplot(self)
     
+    # Additional geoms (NEW!)
+    def geom_ribbon(self, mapping=None, **kwargs):
+        """Add ribbon plot to the plot"""
+        from .additional_geoms import geom_ribbon
+        return geom_ribbon(mapping=mapping, **kwargs)._add_to_ggplot(self)
+    
+    def geom_violin(self, mapping=None, **kwargs):
+        """Add violin plot to the plot"""
+        from .additional_geoms import geom_violin
+        return geom_violin(mapping=mapping, **kwargs)._add_to_ggplot(self)
+    
+    def geom_text(self, mapping=None, **kwargs):
+        """Add text annotations to the plot"""
+        from .additional_geoms import geom_text
+        return geom_text(mapping=mapping, **kwargs)._add_to_ggplot(self)
+    
+    def geom_label(self, mapping=None, **kwargs):
+        """Add text labels with background to the plot"""
+        from .additional_geoms import geom_label
+        return geom_label(mapping=mapping, **kwargs)._add_to_ggplot(self)
+    
+    def geom_errorbar(self, mapping=None, **kwargs):
+        """Add error bars to the plot"""
+        from .additional_geoms import geom_errorbar
+        return geom_errorbar(mapping=mapping, **kwargs)._add_to_ggplot(self)
+    
     # Method chaining for themes
     def theme_minimal(self, **kwargs):
         """Apply minimal theme"""
