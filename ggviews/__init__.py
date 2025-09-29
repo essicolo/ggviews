@@ -21,27 +21,44 @@ from .facets import *
 from .coords import *
 from .viridis import *
 from .advanced_themes import element_blank, element_text, element_line, element_rect, AdvancedTheme
+from .additional_geoms import *
+from .stats import *
+from .positions import *
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"  # Version bump for major feature additions
 __author__ = "ggviews team"
 __email__ = "contact@ggviews.org"
 
 __all__ = [
     'ggplot',
     'aes',
-    # Geoms
+    # Core geoms
     'geom_point',
     'geom_line', 
     'geom_bar',
     'geom_histogram',
     'geom_boxplot',
-    'geom_violin',
     'geom_density',
     'geom_area',
     'geom_smooth',
+    # Additional geoms (NEW!)
     'geom_ribbon',
-    'geom_tile',
+    'geom_violin',
     'geom_text',
+    'geom_label', 
+    'geom_errorbar',
+    # Statistical transformations (NEW!)
+    'stat_smooth',
+    'stat_summary',
+    'geom_smooth_enhanced',
+    # Position adjustments (NEW!)
+    'position_identity',
+    'position_stack',
+    'position_fill',
+    'position_dodge',
+    'position_jitter',
+    'position_nudge',
+    'position_jitterdodge',
     # Themes
     'theme_minimal',
     'theme_classic', 
@@ -54,7 +71,7 @@ __all__ = [
     'element_line', 
     'element_rect',
     'AdvancedTheme',
-    # Scales
+    # Basic scales
     'scale_color_manual',
     'scale_color_discrete',
     'scale_color_continuous',
