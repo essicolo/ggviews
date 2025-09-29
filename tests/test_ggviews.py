@@ -20,6 +20,7 @@ from ggviews.themes import (theme_minimal, theme_classic, theme_bw, theme_dark, 
 from ggviews.scales import (scale_color_manual, scale_color_discrete, scale_color_continuous,
                            scale_x_continuous, scale_y_continuous)
 from ggviews.facets import facet_wrap, facet_grid
+from ggviews.coords import coord_fixed, coord_equal, coord_flip
 from ggviews.utils import labs, xlim, ylim
 
 
