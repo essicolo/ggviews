@@ -607,4 +607,5 @@ __all__ = [
     'geom_smooth',
     'geom_boxplot',
     'geom_density',
+    'geom_area',
 ]
