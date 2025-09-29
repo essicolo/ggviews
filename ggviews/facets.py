@@ -76,7 +76,7 @@ class facet_wrap(Facet):
         self.facets = facets if isinstance(facets, list) else [facets]
         self.ncol = ncol
         self.nrow = nrow
-        self.scales = scales
+        self.scales = scales  # 'fixed', 'free', 'free_x', 'free_y'
         
         # Parse formula format for each facet variable
         self.facet_vars = []
