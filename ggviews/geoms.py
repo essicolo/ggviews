@@ -456,6 +456,7 @@ class geom_density(GeomLayer):
         })
     
     def _render(self, data, combined_aes, ggplot_obj):
+        """Apply density plots"""
         if 'x' not in combined_aes.mappings:
             raise ValueError("geom_density requires x aesthetic")
         
@@ -483,6 +484,117 @@ class geom_density(GeomLayer):
             alpha=self.params['alpha'],
             tools=['hover']
         )
+
+
+class geom_area(GeomLayer):
+    """Area plots
+    
+    Draws an area plot where the area under the curve is filled.
+    Useful for showing cumulative values or stacked areas.
+    
+    Args:
+        mapping: Aesthetic mappings (x, y, fill, color, group, alpha)
+        data: Data for this layer
+        stat: Statistical transformation ('identity' or 'count')
+        position: Position adjustment ('identity', 'stack', 'fill')
+        alpha: Transparency (0-1)
+        fill: Fill color
+        color: Outline color
+        size: Outline width
+        **kwargs: Additional parameters
+        
+    Examples:
+        geom_area(aes(x='year', y='value'))
+        geom_area(aes(x='year', y='value', fill='category'))
+        geom_area(position='stack')  # Stacked areas
+    """
+    
+    def __init__(self, mapping=None, data=None, stat='identity', position='identity',
+                 alpha=0.7, fill=None, color=None, size=1, **kwargs):
+        super().__init__(mapping, data, stat=stat, position=position, **kwargs)
+        self.params.update({
+            'alpha': alpha,
+            'fill': fill,
+            'color': color,
+            'size': size
+        })
+    
+    def _render(self, data, combined_aes, ggplot_obj):
+        """Render area plot"""
+        if 'x' not in combined_aes.mappings or 'y' not in combined_aes.mappings:
+            raise ValueError("geom_area requires both x and y aesthetics")
+        
+        x_col = combined_aes.mappings['x']
+        y_col = combined_aes.mappings['y']
+        
+        if x_col not in data.columns or y_col not in data.columns:
+            warnings.warn(f"Required columns not found: {x_col}, {y_col}")
+            return None
+        
+        # Sort by x for proper area plotting
+        data_sorted = data.sort_values(x_col)
+        x_data = data_sorted[x_col]
+        y_data = data_sorted[y_col]
+        
+        # Handle grouping/fill aesthetic
+        if 'fill' in combined_aes.mappings or 'group' in combined_aes.mappings:
+            group_col = combined_aes.mappings.get('fill') or combined_aes.mappings.get('group')
+            
+            if group_col and group_col in data.columns:
+                # Create separate areas for each group
+                plot_data = []
+                color_map = self._get_color_mapping(combined_aes, data, ggplot_obj)
+                
+                if not color_map and 'fill' in combined_aes.mappings:
+                    # Generate colors for unique groups
+                    unique_groups = sorted(data[group_col].unique())
+                    colors = ggplot_obj.default_colors[:len(unique_groups)]
+                    color_map = dict(zip(unique_groups, colors))
+                
+                for group_val in data_sorted[group_col].unique():
+                    group_mask = data_sorted[group_col] == group_val
+                    if group_mask.any():
+                        group_data = data_sorted[group_mask].copy()
+                        
+                        # Create area data (x, y pairs)
+                        area_data = pd.DataFrame({
+                            'x': group_data[x_col],
+                            'y': group_data[y_col]
+                        }).sort_values('x')
+                        
+                        # Get color for this group
+                        if color_map and group_val in color_map:
+                            area_color = color_map[group_val]
+                        else:
+                            area_color = self.params.get('fill') or ggplot_obj.default_colors[0]
+                        
+                        area_plot = hv.Area(area_data).opts(
+                            color=area_color,
+                            alpha=self.params['alpha'],
+                            tools=['hover']
+                        )
+                        
+                        plot_data.append(area_plot)
+                
+                if plot_data:
+                    return hv.Overlay(plot_data)
+            
+        else:
+            # Single area
+            area_data = pd.DataFrame({
+                'x': x_data,
+                'y': y_data
+            })
+            
+            area_color = self.params.get('fill') or self.params.get('color') or ggplot_obj.default_colors[0]
+            
+            return hv.Area(area_data).opts(
+                color=area_color,
+                alpha=self.params['alpha'],
+                tools=['hover']
+            )
+        
+        return None
 
 
 # Export all geom classes
