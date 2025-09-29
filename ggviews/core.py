@@ -333,3 +333,24 @@ class ggplot:
         """Apply facet grid"""
         from .facets import facet_grid
         return facet_grid(facets, **kwargs)._add_to_ggplot(self)
+    
+    # Method chaining for coordinate systems
+    def coord_fixed(self, ratio=1, **kwargs):
+        """Apply fixed aspect ratio coordinate system"""
+        from .coords import coord_fixed
+        return coord_fixed(ratio=ratio, **kwargs)._add_to_ggplot(self)
+    
+    def coord_equal(self, **kwargs):
+        """Apply equal aspect ratio coordinate system"""
+        from .coords import coord_equal
+        return coord_equal(**kwargs)._add_to_ggplot(self)
+    
+    def coord_flip(self, **kwargs):
+        """Apply coordinate flip"""
+        from .coords import coord_flip
+        return coord_flip(**kwargs)._add_to_ggplot(self)
+    
+    def coord_trans(self, x='identity', y='identity', **kwargs):
+        """Apply coordinate transformation"""
+        from .coords import coord_trans
+        return coord_trans(x=x, y=y, **kwargs)._add_to_ggplot(self)
