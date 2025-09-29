@@ -379,6 +379,21 @@ class ggplot:
         """Apply discrete viridis color scale (American spelling)"""
         return self.scale_colour_viridis_d(**kwargs)
     
+    # Fill viridis scales
+    def scale_fill_viridis_c(self, **kwargs):
+        """Apply continuous viridis fill scale"""
+        from .viridis import scale_fill_viridis_c
+        return scale_fill_viridis_c(**kwargs)._add_to_ggplot(self)
+    
+    def scale_fill_viridis_d(self, **kwargs):
+        """Apply discrete viridis fill scale"""
+        from .viridis import scale_fill_viridis_d
+        return scale_fill_viridis_d(**kwargs)._add_to_ggplot(self)
+    
+    def scale_colour_fill_viridis_d(self, **kwargs):
+        """Apply discrete viridis fill scale (British spelling)"""
+        return self.scale_fill_viridis_d(**kwargs)
+    
     # Advanced theme support
     def theme(self, **kwargs):
         """Apply advanced theme with element-level control"""
