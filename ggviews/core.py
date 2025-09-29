@@ -377,5 +377,5 @@ class ggplot:
     # Advanced theme support
     def theme(self, **kwargs):
         """Apply advanced theme with element-level control"""
-        from .advanced_themes import theme
-        return theme(**kwargs)._add_to_ggplot(self)
+        from .advanced_themes import AdvancedTheme
+        return AdvancedTheme(**kwargs)._add_to_ggplot(self)
