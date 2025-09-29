@@ -8,10 +8,11 @@ with simple examples similar to ggplot2.
 import pandas as pd
 import numpy as np
 from ggviews import ggplot, aes
-from ggviews.geoms import geom_point, geom_line, geom_bar, geom_histogram
+from ggviews.geoms import geom_point, geom_line, geom_bar, geom_histogram, geom_smooth
 from ggviews.themes import theme_minimal, theme_classic
 from ggviews.scales import scale_color_manual
 from ggviews.facets import facet_wrap
+from ggviews.utils import labs
 
 # Create sample data
 np.random.seed(42)
