@@ -211,6 +211,10 @@ class ggplot:
         if 'y' in self.limits:
             final_plot = final_plot.opts(ylim=self.limits['y'])
         
+        # Apply coordinate system
+        if self.coord_system:
+            final_plot = self.coord_system._apply(final_plot, self)
+        
         # Apply facets
         if self.facets:
             final_plot = self.facets._apply(final_plot, self)
