@@ -18,6 +18,7 @@ from .geoms import *
 from .themes import *
 from .scales import *
 from .facets import *
+from .coords import *
 
 __version__ = "0.1.0"
 __author__ = "ggviews team"
@@ -56,6 +57,13 @@ __all__ = [
     # Facets
     'facet_wrap',
     'facet_grid',
+    # Coordinate systems
+    'coord_cartesian',
+    'coord_fixed',
+    'coord_equal', 
+    'coord_flip',
+    'coord_trans',
+    'coord_polar',
     # Utils
     'labs',
     'xlim',
