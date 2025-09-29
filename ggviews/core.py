@@ -228,7 +228,7 @@ class ggplot:
     def __repr__(self):
         return f"<ggplot: {len(self.layers)} layers>"
     
-    # Convenience methods
+    # Convenience methods for method chaining
     def labs(self, title=None, x=None, y=None, **kwargs):
         """Add labels to the plot"""
         from .utils import labs
@@ -243,3 +243,87 @@ class ggplot:
         """Set y-axis limits"""
         from .utils import ylim
         return ylim(*args)._add_to_ggplot(self)
+    
+    # Method chaining for geoms
+    def geom_point(self, mapping=None, **kwargs):
+        """Add points to the plot"""
+        from .geoms import geom_point
+        return geom_point(mapping=mapping, **kwargs)._add_to_ggplot(self)
+    
+    def geom_line(self, mapping=None, **kwargs):
+        """Add lines to the plot"""
+        from .geoms import geom_line
+        return geom_line(mapping=mapping, **kwargs)._add_to_ggplot(self)
+    
+    def geom_bar(self, mapping=None, **kwargs):
+        """Add bars to the plot"""
+        from .geoms import geom_bar
+        return geom_bar(mapping=mapping, **kwargs)._add_to_ggplot(self)
+    
+    def geom_histogram(self, mapping=None, **kwargs):
+        """Add histogram to the plot"""
+        from .geoms import geom_histogram
+        return geom_histogram(mapping=mapping, **kwargs)._add_to_ggplot(self)
+    
+    def geom_smooth(self, mapping=None, **kwargs):
+        """Add smoothed line to the plot"""
+        from .geoms import geom_smooth
+        return geom_smooth(mapping=mapping, **kwargs)._add_to_ggplot(self)
+    
+    def geom_boxplot(self, mapping=None, **kwargs):
+        """Add box plot to the plot"""
+        from .geoms import geom_boxplot
+        return geom_boxplot(mapping=mapping, **kwargs)._add_to_ggplot(self)
+    
+    def geom_density(self, mapping=None, **kwargs):
+        """Add density plot to the plot"""
+        from .geoms import geom_density
+        return geom_density(mapping=mapping, **kwargs)._add_to_ggplot(self)
+    
+    # Method chaining for themes
+    def theme_minimal(self, **kwargs):
+        """Apply minimal theme"""
+        from .themes import theme_minimal
+        return theme_minimal(**kwargs)._add_to_ggplot(self)
+    
+    def theme_classic(self, **kwargs):
+        """Apply classic theme"""
+        from .themes import theme_classic
+        return theme_classic(**kwargs)._add_to_ggplot(self)
+    
+    def theme_bw(self, **kwargs):
+        """Apply black and white theme"""
+        from .themes import theme_bw
+        return theme_bw(**kwargs)._add_to_ggplot(self)
+    
+    def theme_dark(self, **kwargs):
+        """Apply dark theme"""
+        from .themes import theme_dark
+        return theme_dark(**kwargs)._add_to_ggplot(self)
+    
+    # Method chaining for scales
+    def scale_color_manual(self, **kwargs):
+        """Apply manual color scale"""
+        from .scales import scale_color_manual
+        return scale_color_manual(**kwargs)._add_to_ggplot(self)
+    
+    def scale_color_discrete(self, **kwargs):
+        """Apply discrete color scale"""
+        from .scales import scale_color_discrete
+        return scale_color_discrete(**kwargs)._add_to_ggplot(self)
+    
+    def scale_color_continuous(self, **kwargs):
+        """Apply continuous color scale"""
+        from .scales import scale_color_continuous
+        return scale_color_continuous(**kwargs)._add_to_ggplot(self)
+    
+    # Method chaining for facets
+    def facet_wrap(self, facets, **kwargs):
+        """Apply facet wrap"""
+        from .facets import facet_wrap
+        return facet_wrap(facets, **kwargs)._add_to_ggplot(self)
+    
+    def facet_grid(self, facets, **kwargs):
+        """Apply facet grid"""
+        from .facets import facet_grid
+        return facet_grid(facets, **kwargs)._add_to_ggplot(self)
