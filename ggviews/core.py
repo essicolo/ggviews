@@ -286,6 +286,11 @@ class ggplot:
         from .geoms import geom_density
         return geom_density(mapping=mapping, **kwargs)._add_to_ggplot(self)
     
+    def geom_area(self, mapping=None, **kwargs):
+        """Add area plot to the plot"""
+        from .geoms import geom_area
+        return geom_area(mapping=mapping, **kwargs)._add_to_ggplot(self)
+    
     # Method chaining for themes
     def theme_minimal(self, **kwargs):
         """Apply minimal theme"""
