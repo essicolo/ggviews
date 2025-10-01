@@ -142,7 +142,9 @@ class geom_point(GeomLayer):
         else:
             # Single color
             plot_data = pd.DataFrame({'x': x_data, 'y': y_data})
-            color = self.params.get('color', '#1f77b4')
+            color = self.params.get('color')
+            if color is None:
+                color = '#1f77b4'  # Default blue color
             return hv.Scatter(plot_data).opts(
                 color=color,
                 size=self.params['size'],
