@@ -130,12 +130,17 @@ print("\n6. Testing method chaining with new features:")
 try:
     plot6 = (ggplot(mpg, aes(x='cty', y='hwy', color='displ'))
              .geom_point(alpha=0.7, size=4)
-             .scale_colour_viridis_c(option='plasma')
-             .coord_fixed()
+             .scale_colour_viridis_c()
+             .facet_grid('year ~ drv') 
              .theme_minimal()
-             .theme(**{'panel.grid.minor': element_blank()})
-             .labs(title='Full Method Chaining'))
-    print("✅ Method chaining with all new features works")
+             .labs(title='Advanced Feature Combination',
+                   x='City MPG',
+                   y='Highway MPG',
+                   color='Displacement'))
+    print("✅ Method chaining with new features works")
+    print(f"   Plot layers: {len(plot6.layers)}")
+    print(f"   Plot scales: {len(plot6.scales)}")
+    print(f"   Plot facets: {type(plot6.facets)}")
 except Exception as e:
     print(f"❌ Method chaining failed: {e}")
 
