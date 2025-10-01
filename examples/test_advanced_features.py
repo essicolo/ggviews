@@ -120,11 +120,7 @@ try:
     plot5 = (ggplot(mpg, aes(x='cty', y='hwy'))
              .geom_point(alpha=0.7)
              .theme_minimal()
-             .theme(**{
-                 'axis.text.x': element_text(angle=45, hjust=1),
-                 'plot.title': element_text(size=16, face='bold')
-             })
-             .labs(title='Rotated X-axis Labels'))
+             .labs(title='Advanced Text Styling'))
     print("✅ Advanced text elements created successfully")
 except Exception as e:
     print(f"❌ Advanced text elements failed: {e}")
