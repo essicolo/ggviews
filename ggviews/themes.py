@@ -150,10 +150,10 @@ class theme_dark(Theme):
         """Apply dark theme with appropriate text colors"""
         opts = self.options.copy()
         
-        # Apply dark styling
+        # Apply dark styling - use all keyword arguments
         styled_plot = plot.opts(
-            opts.pop('width', 500),
-            opts.pop('height', 400),
+            width=opts.pop('width', 500),
+            height=opts.pop('height', 400),
             bgcolor=opts.pop('bgcolor', '#2F2F2F'),
             show_grid=opts.pop('show_grid', True),
             gridstyle=opts.pop('gridstyle', {}),
