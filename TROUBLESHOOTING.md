@@ -1,10 +1,19 @@
 # ggviews Troubleshooting Guide
 
-## Common Issues and Solutions
+This guide helps you resolve common issues when using ggviews.
 
-### 1. Import Errors
+## Table of Contents
+1. [Installation Issues](#installation-issues)
+2. [Import Errors](#import-errors)
+3. [Plot Rendering Issues](#plot-rendering-issues)
+4. [Data and Aesthetic Mapping Issues](#data-and-aesthetic-mapping-issues)
+5. [Theme and Styling Issues](#theme-and-styling-issues)
+6. [Jupyter Notebook Issues](#jupyter-notebook-issues)
+7. [Common Error Messages](#common-error-messages)
 
-**Error:** `ImportError: No module named 'ggviews'`
+## Installation Issues
+
+### Problem: "No module named 'ggviews'"
 
 **Solution:**
 ```bash
