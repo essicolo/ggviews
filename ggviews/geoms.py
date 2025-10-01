@@ -37,7 +37,15 @@ class GeomLayer:
             if col_name in data.columns:
                 return data[col_name]
             else:
-                warnings.warn(f"Column '{col_name}' not found in data for aesthetic '{aes_name}'")
+                available_cols = list(data.columns)
+                # Check for case-sensitive matches
+                case_matches = [col for col in available_cols if col.lower() == col_name.lower()]
+                if case_matches:
+                    print(f"⚠️  WARNING: Column '{col_name}' not found. Did you mean '{case_matches[0]}'?")
+                    print(f"   Available columns: {available_cols}")
+                else:
+                    print(f"⚠️  WARNING: Column '{col_name}' not found in data for aesthetic '{aes_name}'")
+                    print(f"   Available columns: {available_cols}")
                 return default_value
         elif aes_name in self.params:
             return self.params[aes_name]
