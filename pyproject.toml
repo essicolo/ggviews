@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ggviews"
+version = "0.1.0"
+description = "ggplot2 interface to holoviews"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Essi Parent", email = "essiparent@icloud.com"}
+]
+keywords = ["data-science", "visualization", "analysis"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+
+dependencies = [
+    "holoviews>=1.15.0",
+    "pandas>=1.3.0",
+    "numpy>=1.20.0",
+    "bokeh>=2.4.0",
+    "matplotlib>=3.5.0",
+    "jupyter>=1.0.0",
+    "notebook>=6.4.0",
+    "scipy>=1.7.0",
+    "scikit-learn>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=22.0.0",
+    "flake8>=4.0.0",
+    "mypy>=0.950",
+]
+
+[project.urls]
+Homepage = "https://github.com/essicolo/ggviews"
+Repository = "https://github.com/essicolo/ggviews"
+Documentation = "https://github.com/essicolo/ggviews"
+
+[tool.setuptools]
+packages = ["ggviews"]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true

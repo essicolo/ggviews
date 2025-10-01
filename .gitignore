@@ -3,6 +3,7 @@
 # IDE and editors
 .idea/
 .vscode/
+.emergent
 
 # Dependencies
 node_modules/
@@ -81,3 +82,5 @@ android-sdk/ -e
 # Environment files
 *.env
 *.env.*
+
+*.egg-info/
