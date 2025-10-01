@@ -61,6 +61,17 @@ class GeomLayer:
                 n_colors = len(unique_vals)
                 colors = ggplot_obj.default_colors[:n_colors] if n_colors <= len(ggplot_obj.default_colors) else ggplot_obj.default_colors * ((n_colors // len(ggplot_obj.default_colors)) + 1)
                 return dict(zip(unique_vals, colors[:n_colors]))
+            else:
+                # Column not found - provide helpful error message  
+                available_cols = list(data.columns)
+                case_matches = [col for col in available_cols if col.lower() == color_col.lower()]
+                if case_matches:
+                    print(f"🔴 ERROR: Color mapping failed! Column '{color_col}' not found.")
+                    print(f"   💡 Did you mean '{case_matches[0]}'? (Note the different capitalization)")
+                    print(f"   Available columns: {available_cols}")
+                else:
+                    print(f"🔴 ERROR: Color mapping failed! Column '{color_col}' not found.")
+                    print(f"   Available columns: {available_cols}")
         return {}
     
     def _render(self, data, combined_aes, ggplot_obj):
