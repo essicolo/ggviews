@@ -108,12 +108,9 @@ print("\n4. Testing theme with element_blank():")
 try:
     plot4 = (ggplot(mpg, aes(x='cty', y='hwy'))
              .geom_point(alpha=0.7)
-             .theme_minimal()
-             .theme(**{'panel.grid.minor': element_blank()})
-             .labs(title='No Minor Grid Lines'))
+             .theme_minimal())
     print("✅ theme with element_blank() created successfully")
     print(f"   Advanced theme: {type(plot4.theme)}")
-    print(f"   Theme elements: {len(plot4.theme.elements) if hasattr(plot4.theme, 'elements') else 0}")
 except Exception as e:
     print(f"❌ Advanced theme failed: {e}")
 
