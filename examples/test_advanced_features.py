@@ -159,7 +159,6 @@ try:
                   .facet_grid('year ~ drv')
                   .coord_fixed()
                   .theme_minimal()
-                  .theme(**{'panel.grid.minor': element_blank()})
                   .labs(title='Perfect ggplot2 Recreation',
                         x='City MPG', y='Highway MPG', color='Engine Displacement'))
     
