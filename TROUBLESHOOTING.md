@@ -78,13 +78,30 @@ plot = ggplot(df, aes(x='height', y='weight')) + geom_point() + theme_minimal()
 
 ### 4. Data Issues
 
-**Error:** `KeyError: 'column_name'`
+### Problem: "KeyError" - column not found or empty plot canvas
 
-**Solution:** Check your column names:
+**Solution:**
 ```python
-print(df.columns.tolist())  # Check available columns
-# Make sure column names match exactly
+# Check available columns
+print(df.columns.tolist())
+
+# Use exact column names (case-sensitive)
+ggplot(df, aes(x='Height', y='Weight'))  # Note capitalization
 ```
+
+**Common Issue**: Case sensitivity in aesthetic mappings
+```python
+# ❌ Wrong - 'Species' column doesn't exist (capital S)
+.geom_point(aes(color='Species'))
+
+# ✅ Correct - 'species' column exists (lowercase s)  
+.geom_point(aes(color='species'))
+```
+
+**New in v0.2+**: ggviews now shows helpful error messages:
+- 🔴 Warns when columns are not found
+- 💡 Suggests similar column names (case-sensitive matches)
+- 🎨 Renders with default colors instead of empty canvas
 
 **Error:** `ValueError: x aesthetic is required`
 
