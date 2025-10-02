@@ -185,17 +185,41 @@ class geom_point(GeomLayer):
                 return overlay
             
         else:
-            # Single color
+            # Single color (no color mapping)
             plot_data = pd.DataFrame({'x': x_data, 'y': y_data})
-            color = self.params.get('color')
-            if color is None:
-                color = '#1f77b4'  # Default blue color
-            return hv.Scatter(plot_data).opts(
-                color=color,
-                size=self.params['size'],
-                alpha=self.params['alpha'],
-                tools=['hover']
-            )
+            
+            # Handle size mapping for single color case
+            if size_data is not None:
+                # Scale size data to reasonable range (5-25 pixels)
+                size_min, size_max = size_data.min(), size_data.max()
+                if size_max > size_min:
+                    # Normalize to 5-25 range
+                    normalized_sizes = 5 + 20 * (size_data - size_min) / (size_max - size_min)
+                else:
+                    normalized_sizes = pd.Series([self.params['size']] * len(size_data))
+                plot_data['size'] = normalized_sizes
+                
+                color = self.params.get('color')
+                if color is None:
+                    color = '#1f77b4'  # Default blue color
+                
+                return hv.Scatter(plot_data, vdims=['size']).opts(
+                    color=color,
+                    size='size',
+                    alpha=self.params['alpha'],
+                    tools=['hover']
+                )
+            else:
+                # No size mapping
+                color = self.params.get('color')
+                if color is None:
+                    color = '#1f77b4'  # Default blue color
+                return hv.Scatter(plot_data).opts(
+                    color=color,
+                    size=self.params['size'],
+                    alpha=self.params['alpha'],
+                    tools=['hover']
+                )
 
 
 class geom_line(GeomLayer):
