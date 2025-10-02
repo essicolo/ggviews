@@ -102,6 +102,11 @@ __all__ = [
     'scale_fill_viridis_c',
     'scale_fill_viridis_d',
     'scale_fill_viridis',
+    # Brewer scales
+    'scale_colour_brewer',
+    'scale_color_brewer',
+    'scale_fill_brewer',
+    'display_brewer_palettes',
     # Facets
     'facet_wrap',
     'facet_grid',
