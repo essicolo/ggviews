@@ -4,9 +4,9 @@ Position dodge implementation for side-by-side positioning
 
 import pandas as pd
 import numpy as np
-from .positions import PositionAdjustment
+from .positions import Position
 
-class position_dodge(PositionAdjustment):
+class position_dodge(Position):
     """Dodge overlapping objects side-by-side
     
     Adjusts position by dodging overlaps to the side. Useful for bar charts,
