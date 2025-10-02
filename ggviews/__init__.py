@@ -24,6 +24,7 @@ from .advanced_themes import element_blank, element_text, element_line, element_
 from .additional_geoms import *
 from .stats import *
 from .positions import *
+from .geom_map import geom_map
 
 __version__ = "0.2.0"  # Version bump for major feature additions
 __author__ = "ggviews team"
