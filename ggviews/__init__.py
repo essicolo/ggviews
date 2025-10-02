@@ -48,6 +48,7 @@ __all__ = [
     'geom_text',
     'geom_label', 
     'geom_errorbar',
+    'geom_map',
     # Statistical transformations (NEW!)
     'stat_smooth',
     'stat_summary',
