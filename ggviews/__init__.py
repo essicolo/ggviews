@@ -56,6 +56,10 @@ __all__ = [
     'geom_label', 
     'geom_errorbar',
     'geom_map',
+    'geom_boxplot',
+    'geom_density',
+    'geom_tile',
+    'geom_raster',
     # Statistical transformations (NEW!)
     'stat_smooth',
     'stat_summary',
