@@ -235,6 +235,20 @@ class ggplot:
         plot = self._render()
         return plot._repr_mimebundle_(include, exclude)
     
+    def _repr_html_(self):
+        """For HTML representation in notebooks"""
+        plot = self._render()
+        if hasattr(plot, '_repr_html_'):
+            return plot._repr_html_()
+        return None
+    
+    def _repr_png_(self):
+        """For PNG representation"""
+        plot = self._render()
+        if hasattr(plot, '_repr_png_'):
+            return plot._repr_png_()
+        return None
+    
     def __repr__(self):
         return f"<ggplot: {len(self.layers)} layers>"
     
