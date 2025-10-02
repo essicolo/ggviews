@@ -74,10 +74,16 @@ __all__ = [
     'position_jitterdodge',
     # Themes
     'theme_minimal',
-    'theme_classic', 
-    'theme_bw',
+    'theme_classic',
     'theme_dark',
     'theme_void',
+    'theme_bw',
+    # Theme elements
+    'theme',
+    'element_blank',
+    'element_text', 
+    'element_line',
+    'element_rect',
     # Advanced theme elements
     'element_blank',
     'element_text',
