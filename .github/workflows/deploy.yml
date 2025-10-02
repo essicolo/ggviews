@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "ggviews/**"
+      - "docs/**"
+      - "pyproject.toml"
+      - ".github/workflows/deploy.yml"
   release:
     types: [created]
 
@@ -12,6 +17,11 @@ permissions:
   contents: read
   pages: write
   id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   deploy:
