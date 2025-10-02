@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![Documentation](https://img.shields.io/badge/docs-github--pages-blue.svg)](https://your-username.github.io/ggviews)
 
-ggviews is a comprehensive Python library that brings the beloved ggplot2 grammar of graphics to Python, built on top of holoviews for interactive visualizations. Create publication-quality plots with the intuitive, layered syntax that R users know and love.
+ggviews is a comprehensive Python library that uses the ggplot2 grammar of graphics on top of holoviews for interactive visualizations. It is an option among other pacakges with similar goals like `plotnine` and `lets-plot`. ggviews was developped mostly with vibe coding to fulfill the need for an interactive ggplot2 interface in Pyodide environments.
 
 ## Features
 
