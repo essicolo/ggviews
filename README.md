@@ -1,9 +1,23 @@
 # ggviews: A ggplot2-style API for holoviews
 
-[![Python Version](https://img.shields.io/badge/python-3.7%2B-blue.svg)](https://www.python.org/downloads/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![Documentation](https://img.shields.io/badge/docs-github--pages-blue.svg)](https://your-username.github.io/ggviews)
 
-ggviews is a Python library that provides a **ggplot2-style API** for creating beautiful, interactive visualizations using **holoviews**. It brings the beloved grammar of graphics from R's ggplot2 to the Python ecosystem with the power and flexibility of holoviews.
+**ggviews** is a comprehensive Python library that brings the beloved ggplot2 grammar of graphics to Python, built on top of holoviews for interactive visualizations. Create publication-quality plots with the intuitive, layered syntax that R users know and love.
+
+## ✨ Recent Major Updates (v0.3.0)
+
+- 🎯 **AUTOMATIC LEGENDS**: Just like ggplot2 - `aes(color='species')` now creates legends automatically
+- 📊 **STATISTICAL GEOMS**: `geom_boxplot()`, `geom_density()` for comprehensive analysis  
+- 🌈 **COLORBREWER INTEGRATION**: Professional publication palettes with `scale_colour_brewer()`
+- 🎛️ **ADVANCED THEMING**: `theme()` with `element_text()`, `element_blank()` for fine control
+- 🗺️ **GEOGRAPHIC MAPPING**: `geom_map()` with multiple projections and features
+- 🔄 **COORDINATE SYSTEMS**: `coord_flip()` for horizontal layouts
+- 🔥 **2D VISUALIZATION**: `geom_tile()`, `geom_raster()` for heatmaps and image data
+- 🔧 **BUG FIXES**: Resolved toolbar duplication, improved notebook display, fixed smooth placement
+
+## 🎯 **60% ggplot2 Coverage Achieved!**
 
 ## Features
 
