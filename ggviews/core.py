@@ -335,6 +335,11 @@ class ggplot:
         from .additional_geoms import geom_errorbar
         return geom_errorbar(mapping=mapping, **kwargs)._add_to_ggplot(self)
     
+    def geom_map(self, mapping=None, **kwargs):
+        """Add geographic map to the plot"""
+        from .geom_map import geom_map
+        return geom_map(mapping=mapping, **kwargs)._add_to_ggplot(self)
+    
     # Method chaining for themes
     def theme_minimal(self, **kwargs):
         """Apply minimal theme"""
