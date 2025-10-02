@@ -108,7 +108,7 @@ class scale_fill_brewer(Scale):
     """
     
     def __init__(self, type='seq', palette='Blues', direction=1, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__('fill', **kwargs)
         self.type = type
         self.palette = palette
         self.direction = direction
