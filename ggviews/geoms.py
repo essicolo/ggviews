@@ -137,16 +137,23 @@ class geom_point(GeomLayer):
                         'x': x_data[mask],
                         'y': y_data[mask]
                     })
-                    scatter = hv.Scatter(cat_data).opts(
+                    # Create scatter with proper label for legend
+                    scatter = hv.Scatter(cat_data, label=str(category)).opts(
                         color=color,
                         size=self.params['size'],
                         alpha=self.params['alpha'],
-                        tools=['hover']
+                        tools=['hover'],
+                        show_legend=True
                     )
                     plot_data.append(scatter)
             
             if plot_data:
-                return hv.Overlay(plot_data)
+                # Create overlay with legend
+                overlay = hv.Overlay(plot_data).opts(
+                    legend_position='right',
+                    show_legend=True
+                )
+                return overlay
             
         else:
             # Single color
