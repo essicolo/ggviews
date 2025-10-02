@@ -419,7 +419,9 @@ class geom_bar(GeomLayer):
             if plot_elements:
                 return hv.Overlay(plot_elements).opts(
                     legend_position='right',
-                    show_legend=True
+                    show_legend=True,
+                    toolbar='above',
+                    shared_axes=False
                 )
         
         # Single color bars (no fill mapping)
