@@ -57,10 +57,17 @@ class GeomLayer:
         if 'color' in combined_aes.mappings:
             color_col = combined_aes.mappings['color']
             if color_col in data.columns:
-                unique_vals = data[color_col].unique()
-                n_colors = len(unique_vals)
-                colors = ggplot_obj.default_colors[:n_colors] if n_colors <= len(ggplot_obj.default_colors) else ggplot_obj.default_colors * ((n_colors // len(ggplot_obj.default_colors)) + 1)
-                return dict(zip(unique_vals, colors[:n_colors]))
+                # Check if viridis or other scale mapping exists first
+                if hasattr(ggplot_obj, 'viridis_discrete_map') and ggplot_obj.viridis_discrete_map:
+                    return ggplot_obj.viridis_discrete_map
+                elif hasattr(ggplot_obj, 'viridis_color_map') and ggplot_obj.viridis_color_map:
+                    return ggplot_obj.viridis_color_map
+                else:
+                    # Use default colors if no scale is applied
+                    unique_vals = data[color_col].unique()
+                    n_colors = len(unique_vals)
+                    colors = ggplot_obj.default_colors[:n_colors] if n_colors <= len(ggplot_obj.default_colors) else ggplot_obj.default_colors * ((n_colors // len(ggplot_obj.default_colors)) + 1)
+                    return dict(zip(unique_vals, colors[:n_colors]))
             else:
                 # Column not found - provide helpful error message  
                 available_cols = list(data.columns)
