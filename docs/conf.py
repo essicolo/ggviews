@@ -52,9 +52,16 @@ html_theme = 'alabaster'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-# Logo and title
-html_logo = '_static/logo.png'
+# Title
 html_title = "ggviews"
+
+# Sidebar configuration - hide navigation
+html_sidebars = {
+    '**': [
+        'about.html',
+        'searchbox.html',
+    ]
+}
 
 # Alabaster theme options to match seekwellpandas style
 html_theme_options = {

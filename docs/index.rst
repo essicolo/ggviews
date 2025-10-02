@@ -34,26 +34,13 @@ Quick Start
 Key Features
 ------------
 
-🎨 **Grammar of Graphics**
-   Build plots layer by layer using the grammar of graphics approach
-
-📊 **Rich Geom Library**
-   Points, lines, bars, boxplots, density plots, heatmaps, and more
-
-🌈 **Professional Color Scales**
-   Viridis, ColorBrewer, and custom color palettes
-
-📈 **Statistical Transformations**
-   Smoothing, density estimation, and statistical summaries
-
-🔧 **Flexible Theming**
-   Fine-grained control over plot appearance
-
-🗺️ **Geographic Visualization**
-   Built-in mapping capabilities with geom_map
-
-📱 **Notebook Integration**
-   Works seamlessly in Jupyter notebooks and other environments
+- **Grammar of Graphics**. Build plots layer by layer using the grammar of graphics approach
+- **Rich Geom Library**. Points, lines, bars, boxplots, density plots, heatmaps, and more
+- **Professional Color Scales**. Viridis, ColorBrewer, and custom color palettes
+- **Statistical Transformations**. Smoothing, density estimation, and statistical summaries
+- **Flexible Theming**. Fine-grained control over plot appearance
+- **Geographic Visualization**. Built-in mapping capabilities with geom_map
+- **Notebook Integration**. Works seamlessly in Jupyter notebooks and other environments
 
 Installation
 ------------
@@ -66,42 +53,13 @@ Contents
 --------
 
 .. toctree::
-   :maxdepth: 2
-   :caption: User Guide
+   :maxdepth: 1
+   :caption: Documentation
    
    user_guide/installation
    user_guide/quickstart
-   user_guide/grammar
-   
-.. toctree::
-   :maxdepth: 2
-   :caption: Examples
-   
    examples/index
-   examples/basic_plots
-   examples/aesthetics
-   examples/theming
-   examples/faceting
-   examples/statistics
-   examples/maps
-
-.. toctree::
-   :maxdepth: 2
-   :caption: API Reference
-   
    api/core
-   api/geoms
-   api/scales
-   api/themes
-   api/facets
-   api/coords
-   
-.. toctree::
-   :maxdepth: 1
-   :caption: Development
-   
-   development/contributing
-   development/changelog
 
 Indices and tables
 ==================
