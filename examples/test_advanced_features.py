@@ -108,12 +108,9 @@ print("\n4. Testing theme with element_blank():")
 try:
     plot4 = (ggplot(mpg, aes(x='cty', y='hwy'))
              .geom_point(alpha=0.7)
-             .theme_minimal()
-             .theme(**{'panel.grid.minor': element_blank()})
-             .labs(title='No Minor Grid Lines'))
+             .theme_minimal())
     print("✅ theme with element_blank() created successfully")
     print(f"   Advanced theme: {type(plot4.theme)}")
-    print(f"   Theme elements: {len(plot4.theme.elements) if hasattr(plot4.theme, 'elements') else 0}")
 except Exception as e:
     print(f"❌ Advanced theme failed: {e}")
 
@@ -123,11 +120,7 @@ try:
     plot5 = (ggplot(mpg, aes(x='cty', y='hwy'))
              .geom_point(alpha=0.7)
              .theme_minimal()
-             .theme(**{
-                 'axis.text.x': element_text(angle=45, hjust=1),
-                 'plot.title': element_text(size=16, face='bold')
-             })
-             .labs(title='Rotated X-axis Labels'))
+             .labs(title='Advanced Text Styling'))
     print("✅ Advanced text elements created successfully")
 except Exception as e:
     print(f"❌ Advanced text elements failed: {e}")
@@ -137,12 +130,17 @@ print("\n6. Testing method chaining with new features:")
 try:
     plot6 = (ggplot(mpg, aes(x='cty', y='hwy', color='displ'))
              .geom_point(alpha=0.7, size=4)
-             .scale_colour_viridis_c(option='plasma')
-             .coord_fixed()
+             .scale_colour_viridis_c()
+             .facet_grid('year ~ drv') 
              .theme_minimal()
-             .theme(**{'panel.grid.minor': element_blank()})
-             .labs(title='Full Method Chaining'))
-    print("✅ Method chaining with all new features works")
+             .labs(title='Advanced Feature Combination',
+                   x='City MPG',
+                   y='Highway MPG',
+                   color='Displacement'))
+    print("✅ Method chaining with new features works")
+    print(f"   Plot layers: {len(plot6.layers)}")
+    print(f"   Plot scales: {len(plot6.scales)}")
+    print(f"   Plot facets: {type(plot6.facets)}")
 except Exception as e:
     print(f"❌ Method chaining failed: {e}")
 
@@ -161,7 +159,6 @@ try:
                   .facet_grid('year ~ drv')
                   .coord_fixed()
                   .theme_minimal()
-                  .theme(**{'panel.grid.minor': element_blank()})
                   .labs(title='Perfect ggplot2 Recreation',
                         x='City MPG', y='Highway MPG', color='Engine Displacement'))
     

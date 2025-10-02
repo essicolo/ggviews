@@ -37,7 +37,15 @@ class GeomLayer:
             if col_name in data.columns:
                 return data[col_name]
             else:
-                warnings.warn(f"Column '{col_name}' not found in data for aesthetic '{aes_name}'")
+                available_cols = list(data.columns)
+                # Check for case-sensitive matches
+                case_matches = [col for col in available_cols if col.lower() == col_name.lower()]
+                if case_matches:
+                    print(f"⚠️  WARNING: Column '{col_name}' not found. Did you mean '{case_matches[0]}'?")
+                    print(f"   Available columns: {available_cols}")
+                else:
+                    print(f"⚠️  WARNING: Column '{col_name}' not found in data for aesthetic '{aes_name}'")
+                    print(f"   Available columns: {available_cols}")
                 return default_value
         elif aes_name in self.params:
             return self.params[aes_name]
@@ -53,6 +61,17 @@ class GeomLayer:
                 n_colors = len(unique_vals)
                 colors = ggplot_obj.default_colors[:n_colors] if n_colors <= len(ggplot_obj.default_colors) else ggplot_obj.default_colors * ((n_colors // len(ggplot_obj.default_colors)) + 1)
                 return dict(zip(unique_vals, colors[:n_colors]))
+            else:
+                # Column not found - provide helpful error message  
+                available_cols = list(data.columns)
+                case_matches = [col for col in available_cols if col.lower() == color_col.lower()]
+                if case_matches:
+                    print(f"🔴 ERROR: Color mapping failed! Column '{color_col}' not found.")
+                    print(f"   💡 Did you mean '{case_matches[0]}'? (Note the different capitalization)")
+                    print(f"   Available columns: {available_cols}")
+                else:
+                    print(f"🔴 ERROR: Color mapping failed! Column '{color_col}' not found.")
+                    print(f"   Available columns: {available_cols}")
         return {}
     
     def _render(self, data, combined_aes, ggplot_obj):
@@ -123,7 +142,9 @@ class geom_point(GeomLayer):
         else:
             # Single color
             plot_data = pd.DataFrame({'x': x_data, 'y': y_data})
-            color = self.params.get('color', '#1f77b4')
+            color = self.params.get('color')
+            if color is None:
+                color = '#1f77b4'  # Default blue color
             return hv.Scatter(plot_data).opts(
                 color=color,
                 size=self.params['size'],

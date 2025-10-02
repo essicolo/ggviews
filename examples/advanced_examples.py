@@ -22,8 +22,8 @@ n = 200
 
 # Simulate experimental data
 experimental_data = pd.DataFrame({
-    'treatment': np.repeat(['Control', 'Treatment A', 'Treatment B'], n//3),
-    'dose': np.tile([0.1, 0.5, 1.0, 2.0], n//4),
+    'treatment': np.tile(['Control', 'Treatment A', 'Treatment B'], n//3 + 1)[:n],
+    'dose': np.tile([0.1, 0.5, 1.0, 2.0], n//4 + 1)[:n],
     'response': np.random.normal(0, 1, n),
     'batch': np.random.choice(['Batch1', 'Batch2', 'Batch3'], n),
     'subject_id': range(n),

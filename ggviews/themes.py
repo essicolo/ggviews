@@ -56,10 +56,10 @@ class theme_minimal(Theme):
         """Apply minimal theme styling"""
         opts = self.options.copy()
         
-        # Apply to all plot elements
+        # Apply to all plot elements - use all keyword arguments
         styled_plot = plot.opts(
-            opts.pop('width', 500),
-            opts.pop('height', 400),
+            width=opts.pop('width', 500),
+            height=opts.pop('height', 400),
             bgcolor=opts.pop('bgcolor', 'white'),
             show_grid=opts.pop('show_grid', True),
             gridstyle=opts.pop('gridstyle', {}),
@@ -150,10 +150,10 @@ class theme_dark(Theme):
         """Apply dark theme with appropriate text colors"""
         opts = self.options.copy()
         
-        # Apply dark styling
+        # Apply dark styling - use all keyword arguments
         styled_plot = plot.opts(
-            opts.pop('width', 500),
-            opts.pop('height', 400),
+            width=opts.pop('width', 500),
+            height=opts.pop('height', 400),
             bgcolor=opts.pop('bgcolor', '#2F2F2F'),
             show_grid=opts.pop('show_grid', True),
             gridstyle=opts.pop('gridstyle', {}),
