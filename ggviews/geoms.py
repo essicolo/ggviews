@@ -353,6 +353,70 @@ class geom_bar(GeomLayer):
             plot_data = data.groupby(x_col)[y_col].sum().reset_index()
             plot_data.columns = ['x', 'y']
         
+        # Handle fill mapping for grouped bars
+        fill_col = combined_aes.mappings.get('fill')
+        
+        if fill_col and fill_col in data.columns:
+            # Create grouped bars with different colors
+            plot_elements = []
+            
+            # Get color mapping (could be brewer or viridis)
+            color_map = {}
+            if hasattr(ggplot_obj, 'brewer_fill_map') and ggplot_obj.brewer_fill_map:
+                color_map = ggplot_obj.brewer_fill_map
+            elif hasattr(ggplot_obj, 'viridis_fill_map') and ggplot_obj.viridis_fill_map:
+                color_map = ggplot_obj.viridis_fill_map
+            else:
+                # Default colors
+                unique_fills = data[fill_col].unique()
+                colors = ggplot_obj.default_colors[:len(unique_fills)]
+                color_map = dict(zip(unique_fills, colors))
+            
+            if self.stat == 'count':
+                # Count by both x and fill
+                grouped = data.groupby([x_col, fill_col]).size().reset_index(name='count')
+                
+                for fill_val, color in color_map.items():
+                    fill_data = grouped[grouped[fill_col] == fill_val]
+                    if not fill_data.empty:
+                        bar_data = pd.DataFrame({
+                            'x': fill_data[x_col],
+                            'y': fill_data['count']
+                        })
+                        
+                        bars = hv.Bars(bar_data, label=str(fill_val)).opts(
+                            color=color,
+                            alpha=self.params['alpha'],
+                            tools=['hover'],
+                            show_legend=True
+                        )
+                        plot_elements.append(bars)
+            else:
+                # Identity stat with fill grouping
+                for fill_val, color in color_map.items():
+                    fill_mask = data[fill_col] == fill_val
+                    fill_data = data[fill_mask]
+                    
+                    if not fill_data.empty:
+                        y_col = combined_aes.mappings['y']
+                        bar_data = fill_data.groupby(x_col)[y_col].sum().reset_index()
+                        bar_data.columns = ['x', 'y']
+                        
+                        bars = hv.Bars(bar_data, label=str(fill_val)).opts(
+                            color=color,
+                            alpha=self.params['alpha'],
+                            tools=['hover'],
+                            show_legend=True
+                        )
+                        plot_elements.append(bars)
+            
+            if plot_elements:
+                return hv.Overlay(plot_elements).opts(
+                    legend_position='right',
+                    show_legend=True
+                )
+        
+        # Single color bars (no fill mapping)
         color = self.params.get('fill') or self.params.get('color') or '#1f77b4'
         
         return hv.Bars(plot_data).opts(
