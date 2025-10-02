@@ -84,11 +84,6 @@ __all__ = [
     'element_text', 
     'element_line',
     'element_rect',
-    # Advanced theme elements
-    'element_blank',
-    'element_text',
-    'element_line', 
-    'element_rect',
     'AdvancedTheme',
     # Basic scales
     'scale_color_manual',
