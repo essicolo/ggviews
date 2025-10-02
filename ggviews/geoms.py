@@ -273,15 +273,21 @@ class geom_line(GeomLayer):
                         'x': x_data[mask],
                         'y': y_data[mask]
                     }).sort_values('x')
-                    curve = hv.Curve(cat_data).opts(
+                    curve = hv.Curve(cat_data, label=str(category)).opts(
                         color=color,
                         line_width=self.params['size'],
-                        alpha=self.params['alpha']
+                        alpha=self.params['alpha'],
+                        show_legend=True
                     )
                     plot_data.append(curve)
             
             if plot_data:
-                return hv.Overlay(plot_data)
+                # Create overlay with legend
+                overlay = hv.Overlay(plot_data).opts(
+                    legend_position='right',
+                    show_legend=True
+                )
+                return overlay
                 
         else:
             # Single color  
