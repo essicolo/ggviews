@@ -62,7 +62,7 @@ df['weight'] = df['weight'] + 0.5 * (df['height'] - 170) + np.random.normal(0, 5
 
 ## License
 
-This project is licensed under the GPL3 License.
+This project is licensed under the MIT License.
 
 ## Acknowledgments
 
