@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ggviews"
-version = "0.1.0"
+version = "0.2.0"
 description = "ggplot2 interface to holoviews"
 readme = "README.md"
 requires-python = ">=3.8"
