@@ -165,6 +165,10 @@ class ggplot:
         
         plots = []
         
+        # Apply scales before rendering layers
+        for scale_name, scale in self.scales.items():
+            scale._apply(None, self, self.data)  # Apply scale to modify ggplot object
+        
         for layer in self.layers:
             layer_data = self._get_data_for_layer(layer.data)
             combined_aes = self._combine_aesthetics(layer.mapping)
@@ -230,6 +234,20 @@ class ggplot:
         """For Jupyter notebook display"""
         plot = self._render()
         return plot._repr_mimebundle_(include, exclude)
+    
+    def _repr_html_(self):
+        """For HTML representation in notebooks"""
+        plot = self._render()
+        if hasattr(plot, '_repr_html_'):
+            return plot._repr_html_()
+        return None
+    
+    def _repr_png_(self):
+        """For PNG representation"""
+        plot = self._render()
+        if hasattr(plot, '_repr_png_'):
+            return plot._repr_png_()
+        return None
     
     def __repr__(self):
         return f"<ggplot: {len(self.layers)} layers>"
@@ -316,6 +334,46 @@ class ggplot:
         """Add error bars to the plot"""
         from .additional_geoms import geom_errorbar
         return geom_errorbar(mapping=mapping, **kwargs)._add_to_ggplot(self)
+    
+    def geom_map(self, mapping=None, **kwargs):
+        """Add geographic map to the plot"""
+        from .geom_map import geom_map
+        return geom_map(mapping=mapping, **kwargs)._add_to_ggplot(self)
+    
+    def geom_boxplot(self, mapping=None, **kwargs):
+        """Add box plots to the plot"""
+        from .geom_boxplot import geom_boxplot
+        return geom_boxplot(mapping=mapping, **kwargs)._add_to_ggplot(self)
+    
+    def geom_density(self, mapping=None, **kwargs):
+        """Add density plots to the plot"""
+        from .geom_density import geom_density
+        return geom_density(mapping=mapping, **kwargs)._add_to_ggplot(self)
+    
+    def geom_tile(self, mapping=None, **kwargs):
+        """Add rectangular tiles to the plot"""
+        from .geom_tile import geom_tile
+        return geom_tile(mapping=mapping, **kwargs)._add_to_ggplot(self)
+    
+    def geom_raster(self, mapping=None, **kwargs):
+        """Add raster/image tiles to the plot"""
+        from .geom_tile import geom_raster
+        return geom_raster(mapping=mapping, **kwargs)._add_to_ggplot(self)
+    
+    def scale_colour_brewer(self, **kwargs):
+        """Add ColorBrewer color scale"""
+        from .brewer_scales import scale_colour_brewer
+        return scale_colour_brewer(**kwargs)._add_to_ggplot(self)
+    
+    def scale_color_brewer(self, **kwargs):
+        """Add ColorBrewer color scale (American spelling)"""
+        from .brewer_scales import scale_color_brewer
+        return scale_color_brewer(**kwargs)._add_to_ggplot(self)
+    
+    def scale_fill_brewer(self, **kwargs):
+        """Add ColorBrewer fill scale"""
+        from .brewer_scales import scale_fill_brewer
+        return scale_fill_brewer(**kwargs)._add_to_ggplot(self)
     
     # Method chaining for themes
     def theme_minimal(self, **kwargs):

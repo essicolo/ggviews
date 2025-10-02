@@ -54,22 +54,30 @@ class theme_minimal(Theme):
     
     def _apply(self, plot, ggplot_obj):
         """Apply minimal theme styling"""
-        opts = self.options.copy()
+        options = self.options.copy()
         
-        # Apply to all plot elements - use all keyword arguments
-        styled_plot = plot.opts(
-            width=opts.pop('width', 500),
-            height=opts.pop('height', 400),
-            bgcolor=opts.pop('bgcolor', 'white'),
-            show_grid=opts.pop('show_grid', True),
-            gridstyle=opts.pop('gridstyle', {}),
-            show_frame=opts.pop('show_frame', False),
-            toolbar=opts.pop('toolbar', 'above'),
-            tools=opts.pop('tools', ['pan', 'wheel_zoom', 'box_zoom', 'reset', 'save']),
-            **opts
-        )
-        
-        return styled_plot
+        # Apply styling - use cleaner approach for toolbar management
+        try:
+            # Apply general options first
+            styled_plot = plot.opts(
+                width=options.pop('width', 500),
+                height=options.pop('height', 400),
+                bgcolor=options.pop('bgcolor', 'white'),
+                show_grid=options.pop('show_grid', True),
+                gridstyle=options.pop('gridstyle', {}),
+                show_frame=options.pop('show_frame', False),
+                toolbar=options.pop('toolbar', 'above'),
+                tools=options.pop('tools', ['pan', 'wheel_zoom', 'box_zoom', 'reset', 'save']),
+                **options
+            )
+            return styled_plot
+        except Exception:
+            # Fallback to basic styling if complex options fail
+            return plot.opts(
+                width=500,
+                height=400,
+                toolbar='above'
+            )
 
 
 class theme_classic(Theme):

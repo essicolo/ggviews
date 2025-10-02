@@ -57,10 +57,21 @@ class GeomLayer:
         if 'color' in combined_aes.mappings:
             color_col = combined_aes.mappings['color']
             if color_col in data.columns:
-                unique_vals = data[color_col].unique()
-                n_colors = len(unique_vals)
-                colors = ggplot_obj.default_colors[:n_colors] if n_colors <= len(ggplot_obj.default_colors) else ggplot_obj.default_colors * ((n_colors // len(ggplot_obj.default_colors)) + 1)
-                return dict(zip(unique_vals, colors[:n_colors]))
+                # Check if viridis or other scale mapping exists first
+                if hasattr(ggplot_obj, 'viridis_discrete_map') and ggplot_obj.viridis_discrete_map:
+                    return ggplot_obj.viridis_discrete_map
+                elif hasattr(ggplot_obj, 'viridis_color_map') and ggplot_obj.viridis_color_map:
+                    return ggplot_obj.viridis_color_map
+                elif hasattr(ggplot_obj, 'brewer_discrete_map') and ggplot_obj.brewer_discrete_map:
+                    return ggplot_obj.brewer_discrete_map
+                elif hasattr(ggplot_obj, 'brewer_fill_map') and ggplot_obj.brewer_fill_map:
+                    return ggplot_obj.brewer_fill_map
+                else:
+                    # Use default colors if no scale is applied
+                    unique_vals = data[color_col].unique()
+                    n_colors = len(unique_vals)
+                    colors = ggplot_obj.default_colors[:n_colors] if n_colors <= len(ggplot_obj.default_colors) else ggplot_obj.default_colors * ((n_colors // len(ggplot_obj.default_colors)) + 1)
+                    return dict(zip(unique_vals, colors[:n_colors]))
             else:
                 # Column not found - provide helpful error message  
                 available_cols = list(data.columns)
@@ -118,6 +129,12 @@ class geom_point(GeomLayer):
         # Handle color mapping
         color_map = self._get_color_mapping(combined_aes, data, ggplot_obj)
         
+        # Handle size mapping
+        size_col = combined_aes.mappings.get('size')
+        size_data = None
+        if size_col and size_col in data.columns:
+            size_data = data[size_col]
+        
         if color_map and 'color' in combined_aes.mappings:
             color_col = combined_aes.mappings['color']
             plot_data = []
@@ -128,29 +145,83 @@ class geom_point(GeomLayer):
                         'x': x_data[mask],
                         'y': y_data[mask]
                     })
-                    scatter = hv.Scatter(cat_data).opts(
-                        color=color,
-                        size=self.params['size'],
-                        alpha=self.params['alpha'],
-                        tools=['hover']
-                    )
+                    
+                    # Handle size mapping for this category
+                    if size_data is not None:
+                        # Scale size data to reasonable range (5-25 pixels)
+                        cat_sizes = size_data[mask]
+                        size_min, size_max = cat_sizes.min(), cat_sizes.max()
+                        if size_max > size_min:
+                            # Normalize to 5-25 range
+                            normalized_sizes = 5 + 20 * (cat_sizes - size_min) / (size_max - size_min)
+                        else:
+                            normalized_sizes = pd.Series([self.params['size']] * len(cat_sizes))
+                        cat_data['size'] = normalized_sizes
+                        
+                        # Create scatter with size mapping
+                        scatter = hv.Scatter(cat_data, vdims=['size'], label=str(category)).opts(
+                            color=color,
+                            size='size',
+                            alpha=self.params['alpha'],
+                            tools=['hover'],
+                            show_legend=True
+                        )
+                    else:
+                        # Create scatter with proper label for legend
+                        scatter = hv.Scatter(cat_data, label=str(category)).opts(
+                            color=color,
+                            size=self.params['size'],
+                            alpha=self.params['alpha'],
+                            tools=['hover'],
+                            show_legend=True
+                        )
+                    
                     plot_data.append(scatter)
             
             if plot_data:
-                return hv.Overlay(plot_data)
+                # Create overlay with legend
+                overlay = hv.Overlay(plot_data).opts(
+                    legend_position='right',
+                    show_legend=True
+                )
+                return overlay
             
         else:
-            # Single color
+            # Single color (no color mapping)
             plot_data = pd.DataFrame({'x': x_data, 'y': y_data})
-            color = self.params.get('color')
-            if color is None:
-                color = '#1f77b4'  # Default blue color
-            return hv.Scatter(plot_data).opts(
-                color=color,
-                size=self.params['size'],
-                alpha=self.params['alpha'],
-                tools=['hover']
-            )
+            
+            # Handle size mapping for single color case
+            if size_data is not None:
+                # Scale size data to reasonable range (5-25 pixels)
+                size_min, size_max = size_data.min(), size_data.max()
+                if size_max > size_min:
+                    # Normalize to 5-25 range
+                    normalized_sizes = 5 + 20 * (size_data - size_min) / (size_max - size_min)
+                else:
+                    normalized_sizes = pd.Series([self.params['size']] * len(size_data))
+                plot_data['size'] = normalized_sizes
+                
+                color = self.params.get('color')
+                if color is None:
+                    color = '#1f77b4'  # Default blue color
+                
+                return hv.Scatter(plot_data, vdims=['size']).opts(
+                    color=color,
+                    size='size',
+                    alpha=self.params['alpha'],
+                    tools=['hover']
+                )
+            else:
+                # No size mapping
+                color = self.params.get('color')
+                if color is None:
+                    color = '#1f77b4'  # Default blue color
+                return hv.Scatter(plot_data).opts(
+                    color=color,
+                    size=self.params['size'],
+                    alpha=self.params['alpha'],
+                    tools=['hover']
+                )
 
 
 class geom_line(GeomLayer):
@@ -204,15 +275,21 @@ class geom_line(GeomLayer):
                         'x': x_data[mask],
                         'y': y_data[mask]
                     }).sort_values('x')
-                    curve = hv.Curve(cat_data).opts(
+                    curve = hv.Curve(cat_data, label=str(category)).opts(
                         color=color,
                         line_width=self.params['size'],
-                        alpha=self.params['alpha']
+                        alpha=self.params['alpha'],
+                        show_legend=True
                     )
                     plot_data.append(curve)
             
             if plot_data:
-                return hv.Overlay(plot_data)
+                # Create overlay with legend
+                overlay = hv.Overlay(plot_data).opts(
+                    legend_position='right',
+                    show_legend=True
+                )
+                return overlay
                 
         else:
             # Single color  
@@ -278,6 +355,70 @@ class geom_bar(GeomLayer):
             plot_data = data.groupby(x_col)[y_col].sum().reset_index()
             plot_data.columns = ['x', 'y']
         
+        # Handle fill mapping for grouped bars
+        fill_col = combined_aes.mappings.get('fill')
+        
+        if fill_col and fill_col in data.columns:
+            # Create grouped bars with different colors
+            plot_elements = []
+            
+            # Get color mapping (could be brewer or viridis)
+            color_map = {}
+            if hasattr(ggplot_obj, 'brewer_fill_map') and ggplot_obj.brewer_fill_map:
+                color_map = ggplot_obj.brewer_fill_map
+            elif hasattr(ggplot_obj, 'viridis_fill_map') and ggplot_obj.viridis_fill_map:
+                color_map = ggplot_obj.viridis_fill_map
+            else:
+                # Default colors
+                unique_fills = data[fill_col].unique()
+                colors = ggplot_obj.default_colors[:len(unique_fills)]
+                color_map = dict(zip(unique_fills, colors))
+            
+            if self.stat == 'count':
+                # Count by both x and fill
+                grouped = data.groupby([x_col, fill_col]).size().reset_index(name='count')
+                
+                for fill_val, color in color_map.items():
+                    fill_data = grouped[grouped[fill_col] == fill_val]
+                    if not fill_data.empty:
+                        bar_data = pd.DataFrame({
+                            'x': fill_data[x_col],
+                            'y': fill_data['count']
+                        })
+                        
+                        bars = hv.Bars(bar_data, label=str(fill_val)).opts(
+                            color=color,
+                            alpha=self.params['alpha'],
+                            tools=['hover'],
+                            show_legend=True
+                        )
+                        plot_elements.append(bars)
+            else:
+                # Identity stat with fill grouping
+                for fill_val, color in color_map.items():
+                    fill_mask = data[fill_col] == fill_val
+                    fill_data = data[fill_mask]
+                    
+                    if not fill_data.empty:
+                        y_col = combined_aes.mappings['y']
+                        bar_data = fill_data.groupby(x_col)[y_col].sum().reset_index()
+                        bar_data.columns = ['x', 'y']
+                        
+                        bars = hv.Bars(bar_data, label=str(fill_val)).opts(
+                            color=color,
+                            alpha=self.params['alpha'],
+                            tools=['hover'],
+                            show_legend=True
+                        )
+                        plot_elements.append(bars)
+            
+            if plot_elements:
+                return hv.Overlay(plot_elements).opts(
+                    legend_position='right',
+                    show_legend=True
+                )
+        
+        # Single color bars (no fill mapping)
         color = self.params.get('fill') or self.params.get('color') or '#1f77b4'
         
         return hv.Bars(plot_data).opts(

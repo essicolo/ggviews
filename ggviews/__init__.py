@@ -24,6 +24,14 @@ from .advanced_themes import element_blank, element_text, element_line, element_
 from .additional_geoms import *
 from .stats import *
 from .positions import *
+from .geom_map import geom_map
+from .geom_boxplot import geom_boxplot
+from .geom_density import geom_density
+from .geom_tile import geom_tile, geom_raster
+from .coord_flip import coord_flip
+from .brewer_scales import scale_colour_brewer, scale_color_brewer, scale_fill_brewer, display_brewer_palettes
+from .position_dodge import position_dodge
+from .theme_elements import theme, element_blank, element_text, element_line, element_rect
 
 __version__ = "0.2.0"  # Version bump for major feature additions
 __author__ = "ggviews team"
@@ -47,6 +55,11 @@ __all__ = [
     'geom_text',
     'geom_label', 
     'geom_errorbar',
+    'geom_map',
+    'geom_boxplot',
+    'geom_density',
+    'geom_tile',
+    'geom_raster',
     # Statistical transformations (NEW!)
     'stat_smooth',
     'stat_summary',
@@ -61,14 +74,15 @@ __all__ = [
     'position_jitterdodge',
     # Themes
     'theme_minimal',
-    'theme_classic', 
-    'theme_bw',
+    'theme_classic',
     'theme_dark',
     'theme_void',
-    # Advanced theme elements
+    'theme_bw',
+    # Theme elements
+    'theme',
     'element_blank',
-    'element_text',
-    'element_line', 
+    'element_text', 
+    'element_line',
     'element_rect',
     'AdvancedTheme',
     # Basic scales
@@ -89,6 +103,11 @@ __all__ = [
     'scale_fill_viridis_c',
     'scale_fill_viridis_d',
     'scale_fill_viridis',
+    # Brewer scales
+    'scale_colour_brewer',
+    'scale_color_brewer',
+    'scale_fill_brewer',
+    'display_brewer_palettes',
     # Facets
     'facet_wrap',
     'facet_grid',
