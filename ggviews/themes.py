@@ -57,17 +57,28 @@ class theme_minimal(Theme):
         opts = self.options.copy()
         
         # Apply to all plot elements - use all keyword arguments
-        styled_plot = plot.opts(
-            width=opts.pop('width', 500),
-            height=opts.pop('height', 400),
-            bgcolor=opts.pop('bgcolor', 'white'),
-            show_grid=opts.pop('show_grid', True),
-            gridstyle=opts.pop('gridstyle', {}),
-            show_frame=opts.pop('show_frame', False),
-            toolbar=opts.pop('toolbar', 'above'),
-            tools=opts.pop('tools', ['pan', 'wheel_zoom', 'box_zoom', 'reset', 'save']),
-            **opts
-        )
+        # For overlays, apply options only at the top level to avoid duplication
+        if hasattr(plot, 'type') and 'Overlay' in str(type(plot)):
+            # For overlays, only set frame-level options
+            styled_plot = plot.opts(
+                width=opts.pop('width', 500),
+                height=opts.pop('height', 400),
+                toolbar=opts.pop('toolbar', 'above'),
+                **opts
+            )
+        else:
+            # For single elements, apply all options
+            styled_plot = plot.opts(
+                width=opts.pop('width', 500),
+                height=opts.pop('height', 400),
+                bgcolor=opts.pop('bgcolor', 'white'),
+                show_grid=opts.pop('show_grid', True),
+                gridstyle=opts.pop('gridstyle', {}),
+                show_frame=opts.pop('show_frame', False),
+                toolbar=opts.pop('toolbar', 'above'),
+                tools=opts.pop('tools', ['pan', 'wheel_zoom', 'box_zoom', 'reset', 'save']),
+                **opts
+            )
         
         return styled_plot
 
