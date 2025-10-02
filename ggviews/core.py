@@ -340,6 +340,41 @@ class ggplot:
         from .geom_map import geom_map
         return geom_map(mapping=mapping, **kwargs)._add_to_ggplot(self)
     
+    def geom_boxplot(self, mapping=None, **kwargs):
+        """Add box plots to the plot"""
+        from .geom_boxplot import geom_boxplot
+        return geom_boxplot(mapping=mapping, **kwargs)._add_to_ggplot(self)
+    
+    def geom_density(self, mapping=None, **kwargs):
+        """Add density plots to the plot"""
+        from .geom_density import geom_density
+        return geom_density(mapping=mapping, **kwargs)._add_to_ggplot(self)
+    
+    def geom_tile(self, mapping=None, **kwargs):
+        """Add rectangular tiles to the plot"""
+        from .geom_tile import geom_tile
+        return geom_tile(mapping=mapping, **kwargs)._add_to_ggplot(self)
+    
+    def geom_raster(self, mapping=None, **kwargs):
+        """Add raster/image tiles to the plot"""
+        from .geom_tile import geom_raster
+        return geom_raster(mapping=mapping, **kwargs)._add_to_ggplot(self)
+    
+    def scale_colour_brewer(self, **kwargs):
+        """Add ColorBrewer color scale"""
+        from .brewer_scales import scale_colour_brewer
+        return scale_colour_brewer(**kwargs)._add_to_ggplot(self)
+    
+    def scale_color_brewer(self, **kwargs):
+        """Add ColorBrewer color scale (American spelling)"""
+        from .brewer_scales import scale_color_brewer
+        return scale_color_brewer(**kwargs)._add_to_ggplot(self)
+    
+    def scale_fill_brewer(self, **kwargs):
+        """Add ColorBrewer fill scale"""
+        from .brewer_scales import scale_fill_brewer
+        return scale_fill_brewer(**kwargs)._add_to_ggplot(self)
+    
     # Method chaining for themes
     def theme_minimal(self, **kwargs):
         """Apply minimal theme"""
