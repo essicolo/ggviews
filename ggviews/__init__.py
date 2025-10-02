@@ -25,6 +25,13 @@ from .additional_geoms import *
 from .stats import *
 from .positions import *
 from .geom_map import geom_map
+from .geom_boxplot import geom_boxplot
+from .geom_density import geom_density
+from .geom_tile import geom_tile, geom_raster
+from .coord_flip import coord_flip
+from .brewer_scales import scale_colour_brewer, scale_color_brewer, scale_fill_brewer, display_brewer_palettes
+from .position_dodge import position_dodge
+from .theme_elements import theme, element_blank, element_text, element_line, element_rect
 
 __version__ = "0.2.0"  # Version bump for major feature additions
 __author__ = "ggviews team"
