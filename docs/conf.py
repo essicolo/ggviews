@@ -13,11 +13,11 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'ggviews'
-copyright = '2024, ggviews contributors'
-author = 'ggviews contributors'
+copyright = '2024, Essi Parent'
+author = 'Essi Parent'
 
 # The full version, including alpha/beta/rc tags
-release = '0.3.0'
+release = '0.2.0'
 
 # -- General configuration ---------------------------------------------------
 
@@ -44,31 +44,29 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # -- Options for HTML output -------------------------------------------------
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
-html_theme = 'furo'
+# The theme to use for HTML and HTML Help pages - matching seekwellpandas
+html_theme = 'alabaster'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-# Custom sidebar
-html_theme_options = {
-    "sidebar_hide_name": True,
-    "light_css_variables": {
-        "color-brand-primary": "#1f77b4",
-        "color-brand-content": "#1f77b4",
-    },
-    "dark_css_variables": {
-        "color-brand-primary": "#4fc3f7",
-        "color-brand-content": "#4fc3f7",
-    },
-}
-
-# Logo
-html_logo = "_static/ggviews_logo.png"
+# Logo and title
+html_logo = '_static/logo.png'
 html_title = "ggviews"
+
+# Alabaster theme options to match seekwellpandas style
+html_theme_options = {
+    'logo': 'logo.png',
+    'logo_name': True,
+    'description': 'ggplot2 interface to holoviews',
+    'github_user': 'essicolo',
+    'github_repo': 'ggviews',
+    'github_type': 'star',
+    'show_related': False,
+    'note_bg': '#FFF59C',
+}
 
 # Napoleon settings
 napoleon_google_docstring = True

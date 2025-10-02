@@ -21,93 +21,93 @@ jobs:
       pages: write
       id-token: write
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.x'
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install build twine sphinx sphinx-rtd-theme nbsphinx jupyter
-        pip install -e .
-    - name: Extract version
-      id: get_version
-      run: |
-        version=$(python -c "import ggviews; print(ggviews.__version__)")
-        echo "VERSION=$version" >> $GITHUB_OUTPUT
-    - name: Build package
-      run: python -m build
-    - name: Publish package to PyPI
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-      run: |
-        # Check if version already exists on PyPI
-        if pip index versions ggviews 2>/dev/null | grep -q "${{ steps.get_version.outputs.VERSION }}"; then
-          echo "Version ${{ steps.get_version.outputs.VERSION }} already exists on PyPI, skipping upload"
-        else
-          echo "Uploading version ${{ steps.get_version.outputs.VERSION }} to PyPI"
-          twine upload dist/*
-        fi
-    - name: Create GitHub Release
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        # Check if release already exists
-        if gh release view v${{ steps.get_version.outputs.VERSION }} >/dev/null 2>&1; then
-          echo "Release v${{ steps.get_version.outputs.VERSION }} already exists, skipping creation"
-        else
-          echo "Creating release v${{ steps.get_version.outputs.VERSION }}"
-          gh release create v${{ steps.get_version.outputs.VERSION }} \
-            --title "Release ${{ steps.get_version.outputs.VERSION }}" \
-            --notes "Release notes for version ${{ steps.get_version.outputs.VERSION }}" \
-            ./dist/*
-        fi
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine sphinx sphinx-rtd-theme nbsphinx jupyter myst-parser
+          pip install -e .
+      - name: Extract version
+        id: get_version
+        run: |
+          version=$(python -c "import ggviews; print(ggviews.__version__)")
+          echo "VERSION=$version" >> $GITHUB_OUTPUT
+      - name: Build package
+        run: python -m build
+      - name: Publish package to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          # Check if version already exists on PyPI
+          if pip index versions ggviews 2>/dev/null | grep -q "${{ steps.get_version.outputs.VERSION }}"; then
+            echo "Version ${{ steps.get_version.outputs.VERSION }} already exists on PyPI, skipping upload"
+          else
+            echo "Uploading version ${{ steps.get_version.outputs.VERSION }} to PyPI"
+            twine upload dist/*
+          fi
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Check if release already exists
+          if gh release view v${{ steps.get_version.outputs.VERSION }} >/dev/null 2>&1; then
+            echo "Release v${{ steps.get_version.outputs.VERSION }} already exists, skipping creation"
+          else
+            echo "Creating release v${{ steps.get_version.outputs.VERSION }}"
+            gh release create v${{ steps.get_version.outputs.VERSION }} \
+              --title "Release ${{ steps.get_version.outputs.VERSION }}" \
+              --notes "Release notes for version ${{ steps.get_version.outputs.VERSION }}" \
+              ./dist/*
+          fi
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
-    # Setup Pages
-    - name: Setup Pages
-      uses: actions/configure-pages@v5
-    # Build documentation
-    - name: Build documentation
-      run: |
-        # Create docs directory if it doesn't exist
-        if [ ! -d "docs" ]; then
-          mkdir docs
-          cd docs
-          sphinx-quickstart -q --sep --project "ggviews" --author "Essi Parent" --release "${{ steps.get_version.outputs.VERSION }}" --language "en" --extensions "sphinx.ext.autodoc,sphinx.ext.viewcode,nbsphinx"
-          echo "Welcome to ggviews documentation!" > source/index.rst
-          echo "====================================" >> source/index.rst
-          echo "" >> source/index.rst
-          echo ".. toctree::" >> source/index.rst
-          echo "   :maxdepth: 2" >> source/index.rst
-          echo "   :caption: Contents:" >> source/index.rst
-          echo "" >> source/index.rst
-          echo "   modules" >> source/index.rst
-        else
-          cd docs
-        fi
-        # Install Pandoc for Jupyter notebook conversion
-        sudo apt-get update
-        sudo apt-get install -y pandoc
-        # Install needed documentation dependencies explicitly
-        pip install sphinx sphinx-rtd-theme nbsphinx jupyter
-        # Build docs with sphinx-build
-        if [ -f "Makefile" ]; then
-          make html
-        else
-          sphinx-build -b html source _build/html
-        fi
-        # Check what files were created
-        ls -la _build/html || echo "No _build/html directory found"
+      # Setup Pages
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      # Build documentation
+      - name: Build documentation
+        run: |
+          # Create docs directory if it doesn't exist
+          if [ ! -d "docs" ]; then
+            mkdir docs
+            cd docs
+            sphinx-quickstart -q --sep --project "ggviews" --author "Essi Parent" --release "${{ steps.get_version.outputs.VERSION }}" --language "en" --extensions "sphinx.ext.autodoc,sphinx.ext.viewcode,nbsphinx"
+            echo "Welcome to ggviews documentation!" > source/index.rst
+            echo "====================================" >> source/index.rst
+            echo "" >> source/index.rst
+            echo ".. toctree::" >> source/index.rst
+            echo "   :maxdepth: 2" >> source/index.rst
+            echo "   :caption: Contents:" >> source/index.rst
+            echo "" >> source/index.rst
+            echo "   modules" >> source/index.rst
+          else
+            cd docs
+          fi
+          # Install Pandoc for Jupyter notebook conversion
+          sudo apt-get update
+          sudo apt-get install -y pandoc
+          # Install needed documentation dependencies explicitly
+          pip install sphinx sphinx-rtd-theme nbsphinx jupyter myst-parser
+          # Build docs with sphinx-build
+          if [ -f "Makefile" ]; then
+            make html
+          else
+            sphinx-build -b html source _build/html
+          fi
+          # Check what files were created
+          ls -la _build/html || echo "No _build/html directory found"
 
-    # Upload GitHub Pages artifact
-    - name: Upload GitHub Pages artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: docs/_build/html
+      # Upload GitHub Pages artifact
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/_build/html
 
-    # Deploy to GitHub Pages
-    - name: Deploy to GitHub Pages
-      uses: actions/deploy-pages@v4
+      # Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
