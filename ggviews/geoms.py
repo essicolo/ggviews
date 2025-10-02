@@ -62,6 +62,8 @@ class GeomLayer:
                     return ggplot_obj.viridis_discrete_map
                 elif hasattr(ggplot_obj, 'viridis_color_map') and ggplot_obj.viridis_color_map:
                     return ggplot_obj.viridis_color_map
+                elif hasattr(ggplot_obj, 'brewer_discrete_map') and ggplot_obj.brewer_discrete_map:
+                    return ggplot_obj.brewer_discrete_map
                 else:
                     # Use default colors if no scale is applied
                     unique_vals = data[color_col].unique()
