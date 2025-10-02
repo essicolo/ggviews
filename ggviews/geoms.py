@@ -143,14 +143,37 @@ class geom_point(GeomLayer):
                         'x': x_data[mask],
                         'y': y_data[mask]
                     })
-                    # Create scatter with proper label for legend
-                    scatter = hv.Scatter(cat_data, label=str(category)).opts(
-                        color=color,
-                        size=self.params['size'],
-                        alpha=self.params['alpha'],
-                        tools=['hover'],
-                        show_legend=True
-                    )
+                    
+                    # Handle size mapping for this category
+                    if size_data is not None:
+                        # Scale size data to reasonable range (5-25 pixels)
+                        cat_sizes = size_data[mask]
+                        size_min, size_max = cat_sizes.min(), cat_sizes.max()
+                        if size_max > size_min:
+                            # Normalize to 5-25 range
+                            normalized_sizes = 5 + 20 * (cat_sizes - size_min) / (size_max - size_min)
+                        else:
+                            normalized_sizes = pd.Series([self.params['size']] * len(cat_sizes))
+                        cat_data['size'] = normalized_sizes
+                        
+                        # Create scatter with size mapping
+                        scatter = hv.Scatter(cat_data, vdims=['size'], label=str(category)).opts(
+                            color=color,
+                            size='size',
+                            alpha=self.params['alpha'],
+                            tools=['hover'],
+                            show_legend=True
+                        )
+                    else:
+                        # Create scatter with proper label for legend
+                        scatter = hv.Scatter(cat_data, label=str(category)).opts(
+                            color=color,
+                            size=self.params['size'],
+                            alpha=self.params['alpha'],
+                            tools=['hover'],
+                            show_legend=True
+                        )
+                    
                     plot_data.append(scatter)
             
             if plot_data:
