@@ -165,6 +165,10 @@ class ggplot:
         
         plots = []
         
+        # Apply scales before rendering layers
+        for scale_name, scale in self.scales.items():
+            scale._apply(None, self, self.data)  # Apply scale to modify ggplot object
+        
         for layer in self.layers:
             layer_data = self._get_data_for_layer(layer.data)
             combined_aes = self._combine_aesthetics(layer.mapping)
