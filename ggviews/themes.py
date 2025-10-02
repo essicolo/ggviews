@@ -56,27 +56,36 @@ class theme_minimal(Theme):
         """Apply minimal theme styling"""
         options = self.options.copy()
         
-        # Apply styling - use cleaner approach for toolbar management
+        # Apply styling with single toolbar to prevent duplication
         try:
-            # Apply general options first
             styled_plot = plot.opts(
                 width=options.pop('width', 500),
                 height=options.pop('height', 400),
                 bgcolor=options.pop('bgcolor', 'white'),
                 show_grid=options.pop('show_grid', True),
                 gridstyle=options.pop('gridstyle', {}),
-                show_frame=options.pop('show_frame', False),
-                toolbar=options.pop('toolbar', 'above'),
-                tools=options.pop('tools', ['pan', 'wheel_zoom', 'box_zoom', 'reset', 'save']),
-                **options
+                show_frame=options.pop('show_frame', False)
             )
+            
+            # Apply toolbar only at the overlay level to prevent duplication
+            if hasattr(plot, '_obj_type') and 'Overlay' in str(type(plot)):
+                styled_plot = styled_plot.opts(
+                    toolbar='above',
+                    shared_axes=False
+                )
+            else:
+                styled_plot = styled_plot.opts(
+                    toolbar='above',
+                    tools=['pan', 'wheel_zoom', 'box_zoom', 'reset', 'save']
+                )
+            
             return styled_plot
-        except Exception:
+            
+        except Exception as e:
             # Fallback to basic styling if complex options fail
             return plot.opts(
                 width=500,
-                height=400,
-                toolbar='above'
+                height=400
             )
 
 

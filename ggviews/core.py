@@ -250,6 +250,28 @@ class ggplot:
         return None
     
     def __repr__(self):
+        """String representation that triggers display in some environments"""
+        try:
+            # Try to trigger display for Marimo and other environments
+            plot = self._render()
+            if hasattr(plot, 'show'):
+                plot.show()
+            return f"<ggplot: {len(self.layers)} layer(s)>"
+        except:
+            return f"<ggplot: {len(self.layers)} layer(s)>"
+    
+    def _ipython_display_(self):
+        """For IPython/Jupyter display protocol"""
+        try:
+            plot = self._render()
+            if hasattr(plot, '_ipython_display_'):
+                return plot._ipython_display_()
+            elif hasattr(plot, 'show'):
+                return plot.show()
+        except:
+            pass
+    
+    def __repr__(self):
         return f"<ggplot: {len(self.layers)} layers>"
     
     # Convenience methods for method chaining
