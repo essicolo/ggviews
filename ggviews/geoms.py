@@ -127,6 +127,12 @@ class geom_point(GeomLayer):
         # Handle color mapping
         color_map = self._get_color_mapping(combined_aes, data, ggplot_obj)
         
+        # Handle size mapping
+        size_col = combined_aes.mappings.get('size')
+        size_data = None
+        if size_col and size_col in data.columns:
+            size_data = data[size_col]
+        
         if color_map and 'color' in combined_aes.mappings:
             color_col = combined_aes.mappings['color']
             plot_data = []
