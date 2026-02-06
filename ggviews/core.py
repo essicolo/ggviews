@@ -157,22 +157,52 @@ class ggplot:
             
         return combined
     
+    def _resolve_position(self, position):
+        """Resolve a position argument (string or Position object) to a Position instance."""
+        from .positions import (
+            Position, position_identity, position_stack, position_fill,
+            position_dodge, position_jitter, position_nudge, position_jitterdodge,
+        )
+        if isinstance(position, Position):
+            return position
+        if isinstance(position, str):
+            mapping = {
+                'identity': position_identity,
+                'stack': position_stack,
+                'fill': position_fill,
+                'dodge': position_dodge,
+                'jitter': position_jitter,
+                'nudge': position_nudge,
+                'jitterdodge': position_jitterdodge,
+            }
+            cls = mapping.get(position)
+            if cls is not None:
+                return cls()
+        return None
+
     def _render(self):
         """Render the plot using holoviews"""
         if not self.layers:
             warnings.warn("No layers added to plot")
             return hv.Scatter([]).opts(width=400, height=300)
-        
+
         plots = []
-        
+
         # Apply scales before rendering layers
         for scale_name, scale in self.scales.items():
             scale._apply(None, self, self.data)  # Apply scale to modify ggplot object
-        
+
         for layer in self.layers:
             layer_data = self._get_data_for_layer(layer.data)
             combined_aes = self._combine_aesthetics(layer.mapping)
-            
+
+            # Apply position adjustments
+            position = getattr(layer, 'position', None)
+            if position is not None:
+                pos_obj = self._resolve_position(position)
+                if pos_obj is not None:
+                    layer_data = pos_obj.adjust(layer_data.copy(), combined_aes, layer.params)
+
             # Render layer
             layer_plot = layer._render(layer_data, combined_aes, self)
             if layer_plot is not None:

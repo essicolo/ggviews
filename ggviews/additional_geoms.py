@@ -350,33 +350,51 @@ class geom_errorbar(GeomLayer):
 
 class geom_label(geom_text):
     """Text labels with background boxes
-    
+
     Similar to geom_text but with background rectangles for better readability.
-    
+
     Args:
-        mapping: Aesthetic mappings (x, y, label, color, fill)  
+        mapping: Aesthetic mappings (x, y, label, color, fill)
         data: Data for this layer
-        label_padding: Padding around text
+        label_padding: Padding around text (in data units)
         label_r: Corner radius of label box
         fill: Background fill color
         color: Text color
         **kwargs: Additional parameters inherited from geom_text
     """
-    
-    def __init__(self, mapping=None, data=None, label_padding=0.25, 
+
+    def __init__(self, mapping=None, data=None, label_padding=0.25,
                  label_r=0.15, fill='white', color='black', **kwargs):
         super().__init__(mapping, data, color=color, **kwargs)
         self.params.update({
             'label_padding': label_padding,
             'label_r': label_r,
-            'fill': fill
+            'fill': fill,
         })
-    
+
     def _render(self, data, combined_aes, ggplot_obj):
-        """Render labels with background boxes"""
-        # For now, use the same implementation as geom_text
-        # A full implementation would add background rectangles
-        return super()._render(data, combined_aes, ggplot_obj)
+        """Render labels with background boxes via a Bokeh hook."""
+        labels_el = super()._render(data, combined_aes, ggplot_obj)
+        if labels_el is None:
+            return None
+
+        bg_fill = self.params.get('fill', 'white')
+        bg_alpha = 0.8
+
+        def _add_background(plot, element):
+            """Bokeh post-render hook that sets background on text glyphs."""
+            for renderer in plot.state.renderers:
+                glyph = getattr(renderer, 'glyph', None)
+                if glyph is None:
+                    continue
+                if hasattr(glyph, 'background_fill_color'):
+                    glyph.background_fill_color = bg_fill
+                    glyph.background_fill_alpha = bg_alpha
+                    if hasattr(glyph, 'border_line_color'):
+                        glyph.border_line_color = 'gray'
+                        glyph.border_line_alpha = 0.5
+
+        return labels_el.opts(hooks=[_add_background])
 
 
 # Export all additional geoms

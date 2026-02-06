@@ -185,28 +185,181 @@ class coord_trans(CoordSystem):
 
 class coord_polar(CoordSystem):
     """Polar coordinate system
-    
-    Maps x and y coordinates to angle and radius in a polar coordinate system.
-    Useful for creating pie charts, radar charts, and other circular visualizations.
-    
+
+    Maps data to polar coordinates. When applied to bar charts, this produces
+    pie/donut charts. For scatter and line data, it transforms (theta, r) pairs
+    into Cartesian coordinates for display.
+
     Args:
         theta: Which aesthetic to map to angle ('x' or 'y')
-        start: Starting angle (in radians)
-        direction: Direction of angles (1 for counter-clockwise, -1 for clockwise)
+        start: Starting angle (in radians, 0 = 12 o'clock)
+        direction: Direction of angles (1 for clockwise, -1 for counter-clockwise)
         **kwargs: Additional parameters
+
+    Examples:
+        coord_polar()                    # theta='x', default
+        coord_polar(theta='y')           # y maps to angle
+        coord_polar(start=np.pi/2)       # start at 3 o'clock
     """
-    
+
     def __init__(self, theta='x', start=0, direction=1, **kwargs):
         super().__init__(**kwargs)
         self.theta = theta
         self.start = start
         self.direction = direction
-        
+
     def _apply(self, plot, ggplot_obj):
-        """Apply polar coordinate transformation"""
-        # This would require significant transformation of the underlying plot
-        warnings.warn("coord_polar() not yet fully implemented. Consider using holoviews polar plots directly.")
-        return plot
+        """Apply polar coordinate transformation.
+
+        For Bars elements this creates a pie chart using Path/Polygons.
+        For Scatter/Curve this converts (angle, radius) -> (x, y).
+        """
+        if plot is None:
+            return plot
+
+        # Try to detect the element type inside overlays
+        elements = self._collect_elements(plot)
+        if not elements:
+            return plot
+
+        # Check if we have Bars -> pie chart
+        has_bars = any(isinstance(el, hv.Bars) for el in elements)
+
+        if has_bars:
+            return self._bars_to_pie(elements, ggplot_obj)
+
+        # For other element types, apply angular transformation
+        return self._transform_polar(elements, ggplot_obj)
+
+    # ------------------------------------------------------------------
+    def _collect_elements(self, plot):
+        """Recursively collect leaf HoloViews elements from a plot."""
+        elements = []
+        if isinstance(plot, hv.Overlay):
+            for item in plot:
+                elements.extend(self._collect_elements(item))
+        elif isinstance(plot, hv.Element):
+            elements.append(plot)
+        return elements
+
+    # ------------------------------------------------------------------
+    def _bars_to_pie(self, elements, ggplot_obj):
+        """Convert bar data into a pie/donut chart rendered as filled wedges."""
+        # Gather all bar data
+        labels = []
+        values = []
+        colors = []
+
+        for el in elements:
+            if isinstance(el, hv.Bars):
+                df = el.dframe()
+                if df.empty:
+                    continue
+                xcol = df.columns[0]
+                ycol = df.columns[1] if len(df.columns) > 1 else None
+                if ycol is None:
+                    continue
+                for _, row in df.iterrows():
+                    labels.append(str(row[xcol]))
+                    values.append(float(row[ycol]))
+                    # Try to pick up the bar color
+                    try:
+                        colors.append(el.opts.get('plot').kwargs.get('color', None))
+                    except Exception:
+                        colors.append(None)
+
+        if not values or sum(values) == 0:
+            warnings.warn("coord_polar: no positive bar values to create pie chart")
+            return hv.Overlay([])
+
+        total = sum(values)
+        fractions = [v / total for v in values]
+
+        # Build wedge polygons
+        n_points = 60  # points per wedge arc
+        wedges = []
+        current_angle = self.start
+
+        default_colors = ggplot_obj.default_colors
+        for i, (label, frac) in enumerate(zip(labels, fractions)):
+            sweep = 2 * np.pi * frac * self.direction
+            angles = np.linspace(current_angle, current_angle + sweep, n_points)
+            # Wedge: centre -> arc -> centre
+            xs = np.concatenate([[0], np.cos(angles), [0]])
+            ys = np.concatenate([[0], np.sin(angles), [0]])
+
+            color = colors[i] if colors[i] else default_colors[i % len(default_colors)]
+            wedge = hv.Polygons([{'x': xs, 'y': ys}]).opts(
+                color=color,
+                line_color='white',
+                line_width=1,
+            )
+            wedges.append(wedge)
+
+            # Label at midpoint of arc
+            mid_angle = current_angle + sweep / 2
+            lx = 0.6 * np.cos(mid_angle)
+            ly = 0.6 * np.sin(mid_angle)
+            lbl = hv.Labels(
+                pd.DataFrame({'x': [lx], 'y': [ly], 'text': [label]}),
+                kdims=['x', 'y'], vdims=['text'],
+            ).opts(text_font_size='9pt', text_color='white')
+            wedges.append(lbl)
+
+            current_angle += sweep
+
+        pie = hv.Overlay(wedges).opts(
+            width=450, height=450,
+            xaxis=None, yaxis=None,
+            show_frame=False,
+        )
+        return pie
+
+    # ------------------------------------------------------------------
+    def _transform_polar(self, elements, ggplot_obj):
+        """Transform scatter/curve data from (theta, r) to Cartesian."""
+        transformed = []
+        for el in elements:
+            df = el.dframe()
+            if df.empty:
+                transformed.append(el)
+                continue
+            cols = list(df.columns)
+            if len(cols) < 2:
+                transformed.append(el)
+                continue
+
+            if self.theta == 'x':
+                theta_col, r_col = cols[0], cols[1]
+            else:
+                theta_col, r_col = cols[1], cols[0]
+
+            theta_vals = df[theta_col].astype(float)
+            r_vals = df[r_col].astype(float)
+
+            # Normalise theta to [0, 2*pi]
+            t_min, t_max = theta_vals.min(), theta_vals.max()
+            if t_max > t_min:
+                angles = self.start + self.direction * 2 * np.pi * (theta_vals - t_min) / (t_max - t_min)
+            else:
+                angles = np.full_like(theta_vals, self.start)
+
+            cart_x = r_vals * np.cos(angles)
+            cart_y = r_vals * np.sin(angles)
+            cart_df = pd.DataFrame({'x': cart_x, 'y': cart_y})
+
+            if isinstance(el, hv.Scatter):
+                transformed.append(hv.Scatter(cart_df).opts(tools=['hover']))
+            elif isinstance(el, (hv.Curve, hv.Area)):
+                transformed.append(hv.Curve(cart_df))
+            else:
+                transformed.append(el)
+
+        result = hv.Overlay(transformed) if len(transformed) > 1 else transformed[0]
+        return result.opts(
+            xaxis=None, yaxis=None, show_frame=False,
+            width=450, height=450,
+        )
 
 
 # Convenience functions that mirror ggplot2 API

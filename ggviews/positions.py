@@ -171,40 +171,48 @@ class position_dodge(Position):
         """Dodge positions side-by-side"""
         if 'x' not in combined_aes.mappings:
             return data
-        
+
         x_col = combined_aes.mappings['x']
-        
+        if x_col not in data.columns:
+            return data
+
         # Determine grouping variable
         group_col = None
         for aes_name in ['fill', 'color', 'group']:
             if aes_name in combined_aes.mappings:
                 group_col = combined_aes.mappings[aes_name]
                 break
-        
+
         if group_col is None or group_col not in data.columns:
             return data
-        
+
         adjusted_data = data.copy()
-        
-        for x_val in data[x_col].unique():
-            x_mask = data[x_col] == x_val
-            x_group = data[x_mask]
-            
+
+        # For categorical x, encode to numeric positions first
+        is_numeric = pd.api.types.is_numeric_dtype(data[x_col])
+        if not is_numeric:
+            categories = sorted(data[x_col].unique())
+            cat_to_num = {cat: float(i) for i, cat in enumerate(categories)}
+            adjusted_data[x_col] = data[x_col].map(cat_to_num).astype(float)
+
+        for x_val in adjusted_data[x_col].unique():
+            x_mask = adjusted_data[x_col] == x_val
+            x_group = adjusted_data[x_mask]
+
             unique_groups = x_group[group_col].unique()
             n_groups = len(unique_groups)
-            
+
             if n_groups <= 1:
                 continue
-            
-            # Calculate dodge positions
+
             dodge_width = self.width / n_groups
             start_offset = -self.width / 2 + dodge_width / 2
-            
+
             for i, group_val in enumerate(unique_groups):
-                group_mask = x_mask & (data[group_col] == group_val)
+                group_mask = x_mask & (adjusted_data[group_col] == group_val)
                 offset = start_offset + i * dodge_width
                 adjusted_data.loc[group_mask, x_col] = x_val + offset
-        
+
         return adjusted_data
 
 
@@ -230,23 +238,30 @@ class position_jitter(Position):
         """Add random jitter to positions"""
         if self.seed is not None:
             np.random.seed(self.seed)
-        
+
         adjusted_data = data.copy()
-        
+
         # Jitter x positions
         if 'x' in combined_aes.mappings and self.width is not None:
             x_col = combined_aes.mappings['x']
             if x_col in data.columns:
                 jitter_x = np.random.uniform(-self.width/2, self.width/2, len(data))
-                adjusted_data[x_col] = data[x_col] + jitter_x
-        
-        # Jitter y positions  
+                if pd.api.types.is_numeric_dtype(data[x_col]):
+                    adjusted_data[x_col] = data[x_col] + jitter_x
+                else:
+                    # Categorical x: encode to numeric, then jitter
+                    categories = sorted(data[x_col].unique())
+                    cat_to_num = {cat: float(i) for i, cat in enumerate(categories)}
+                    adjusted_data[x_col] = data[x_col].map(cat_to_num).astype(float) + jitter_x
+
+        # Jitter y positions
         if 'y' in combined_aes.mappings and self.height is not None:
             y_col = combined_aes.mappings['y']
             if y_col in data.columns:
-                jitter_y = np.random.uniform(-self.height/2, self.height/2, len(data))
-                adjusted_data[y_col] = data[y_col] + jitter_y
-        
+                if pd.api.types.is_numeric_dtype(data[y_col]):
+                    jitter_y = np.random.uniform(-self.height/2, self.height/2, len(data))
+                    adjusted_data[y_col] = data[y_col] + jitter_y
+
         return adjusted_data
 
 
