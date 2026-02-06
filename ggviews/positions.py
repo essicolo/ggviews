@@ -310,41 +310,9 @@ class position_jitterdodge(Position):
         return self.jitter.adjust(dodged_data, combined_aes, layer_params)
 
 
-# Convenience functions
-def position_identity():
-    """Identity position (no adjustment)"""
-    return position_identity()
-
-
-def position_stack(vjust=1, reverse=False):
-    """Stack overlapping objects"""  
-    return position_stack(vjust=vjust, reverse=reverse)
-
-
-def position_fill(vjust=1, reverse=False):
-    """Stack and normalize to fill plot"""
-    return position_fill(vjust=vjust, reverse=reverse)
-
-
-def position_dodge(width=0.9, preserve='total'):
-    """Dodge overlapping objects side-to-side"""
-    return position_dodge(width=width, preserve=preserve)
-
-
-def position_jitter(width=None, height=None, seed=None):
-    """Jitter points to reduce overplotting"""
-    return position_jitter(width=width, height=height, seed=seed)
-
-
-def position_nudge(x=0, y=0):
-    """Nudge points by fixed distance"""
-    return position_nudge(x=x, y=y)
-
-
-def position_jitterdodge(dodge_width=0.9, jitter_width=0.4, jitter_height=0, seed=None):
-    """Combine dodging and jittering"""
-    return position_jitterdodge(dodge_width=dodge_width, jitter_width=jitter_width,
-                               jitter_height=jitter_height, seed=seed)
+# The classes above serve as both the class definition and the callable constructor.
+# No separate convenience functions needed -- instantiate classes directly:
+#   position_identity(), position_stack(), position_dodge(width=0.9), etc.
 
 
 # Export all position classes and functions

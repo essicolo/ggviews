@@ -11,7 +11,7 @@ import warnings
 # Set holoviews backend
 try:
     hv.extension('bokeh')
-except:
+except Exception:
     # Fallback to matplotlib if bokeh is not available
     hv.extension('matplotlib')
 
@@ -249,17 +249,6 @@ class ggplot:
             return plot._repr_png_()
         return None
     
-    def __repr__(self):
-        """String representation that triggers display in some environments"""
-        try:
-            # Try to trigger display for Marimo and other environments
-            plot = self._render()
-            if hasattr(plot, 'show'):
-                plot.show()
-            return f"<ggplot: {len(self.layers)} layer(s)>"
-        except:
-            return f"<ggplot: {len(self.layers)} layer(s)>"
-    
     def _ipython_display_(self):
         """For IPython/Jupyter display protocol"""
         try:
@@ -268,9 +257,9 @@ class ggplot:
                 return plot._ipython_display_()
             elif hasattr(plot, 'show'):
                 return plot.show()
-        except:
+        except Exception:
             pass
-    
+
     def __repr__(self):
         return f"<ggplot: {len(self.layers)} layers>"
     
@@ -315,16 +304,6 @@ class ggplot:
         """Add smoothed line to the plot"""
         from .geoms import geom_smooth
         return geom_smooth(mapping=mapping, **kwargs)._add_to_ggplot(self)
-    
-    def geom_boxplot(self, mapping=None, **kwargs):
-        """Add box plot to the plot"""
-        from .geoms import geom_boxplot
-        return geom_boxplot(mapping=mapping, **kwargs)._add_to_ggplot(self)
-    
-    def geom_density(self, mapping=None, **kwargs):
-        """Add density plot to the plot"""
-        from .geoms import geom_density
-        return geom_density(mapping=mapping, **kwargs)._add_to_ggplot(self)
     
     def geom_area(self, mapping=None, **kwargs):
         """Add area plot to the plot"""
@@ -417,7 +396,12 @@ class ggplot:
         """Apply dark theme"""
         from .themes import theme_dark
         return theme_dark(**kwargs)._add_to_ggplot(self)
-    
+
+    def theme_void(self, **kwargs):
+        """Apply void theme (no axes, grid, or background)"""
+        from .themes import theme_void
+        return theme_void(**kwargs)._add_to_ggplot(self)
+
     # Method chaining for scales
     def scale_color_manual(self, **kwargs):
         """Apply manual color scale"""
@@ -458,7 +442,7 @@ class ggplot:
     
     def coord_flip(self, **kwargs):
         """Apply coordinate flip"""
-        from .coords import coord_flip
+        from .coord_flip import coord_flip
         return coord_flip(**kwargs)._add_to_ggplot(self)
     
     def coord_trans(self, x='identity', y='identity', **kwargs):

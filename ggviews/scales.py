@@ -191,17 +191,11 @@ class scale_x_continuous(Scale):
         self.trans = trans
     
     def _apply(self, plot, ggplot_obj, data):
-        """Apply x-axis scale"""
-        opts = {}
-        
+        """Apply x-axis scale -- stores config on ggplot_obj for later application"""
         if self.name is not None:
-            opts['xlabel'] = self.name
-        
+            ggplot_obj.labels.setdefault('x', self.name)
         if self.limits is not None:
-            opts['xlim'] = self.limits
-        
-        if opts:
-            return plot.opts(**opts)
+            ggplot_obj.limits['x'] = self.limits
         return plot
 
 
@@ -228,17 +222,11 @@ class scale_y_continuous(Scale):
         self.trans = trans
     
     def _apply(self, plot, ggplot_obj, data):
-        """Apply y-axis scale"""
-        opts = {}
-        
+        """Apply y-axis scale -- stores config on ggplot_obj for later application"""
         if self.name is not None:
-            opts['ylabel'] = self.name
-        
+            ggplot_obj.labels.setdefault('y', self.name)
         if self.limits is not None:
-            opts['ylim'] = self.limits
-        
-        if opts:
-            return plot.opts(**opts)
+            ggplot_obj.limits['y'] = self.limits
         return plot
 
 
@@ -261,14 +249,9 @@ class scale_x_discrete(Scale):
         self.limits = limits
     
     def _apply(self, plot, ggplot_obj, data):
-        """Apply x-axis discrete scale"""
-        opts = {}
-        
+        """Apply x-axis discrete scale -- stores config on ggplot_obj"""
         if self.name is not None:
-            opts['xlabel'] = self.name
-        
-        if opts:
-            return plot.opts(**opts)
+            ggplot_obj.labels.setdefault('x', self.name)
         return plot
 
 
@@ -291,14 +274,9 @@ class scale_y_discrete(Scale):
         self.limits = limits
     
     def _apply(self, plot, ggplot_obj, data):
-        """Apply y-axis discrete scale"""
-        opts = {}
-        
+        """Apply y-axis discrete scale -- stores config on ggplot_obj"""
         if self.name is not None:
-            opts['ylabel'] = self.name
-        
-        if opts:
-            return plot.opts(**opts)
+            ggplot_obj.labels.setdefault('y', self.name)
         return plot
 
 

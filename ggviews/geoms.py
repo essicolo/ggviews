@@ -41,11 +41,15 @@ class GeomLayer:
                 # Check for case-sensitive matches
                 case_matches = [col for col in available_cols if col.lower() == col_name.lower()]
                 if case_matches:
-                    print(f"⚠️  WARNING: Column '{col_name}' not found. Did you mean '{case_matches[0]}'?")
-                    print(f"   Available columns: {available_cols}")
+                    warnings.warn(
+                        f"Column '{col_name}' not found for aesthetic '{aes_name}'. "
+                        f"Did you mean '{case_matches[0]}'? Available: {available_cols}"
+                    )
                 else:
-                    print(f"⚠️  WARNING: Column '{col_name}' not found in data for aesthetic '{aes_name}'")
-                    print(f"   Available columns: {available_cols}")
+                    warnings.warn(
+                        f"Column '{col_name}' not found in data for aesthetic '{aes_name}'. "
+                        f"Available: {available_cols}"
+                    )
                 return default_value
         elif aes_name in self.params:
             return self.params[aes_name]
@@ -77,12 +81,15 @@ class GeomLayer:
                 available_cols = list(data.columns)
                 case_matches = [col for col in available_cols if col.lower() == color_col.lower()]
                 if case_matches:
-                    print(f"🔴 ERROR: Color mapping failed! Column '{color_col}' not found.")
-                    print(f"   💡 Did you mean '{case_matches[0]}'? (Note the different capitalization)")
-                    print(f"   Available columns: {available_cols}")
+                    warnings.warn(
+                        f"Color mapping failed: column '{color_col}' not found. "
+                        f"Did you mean '{case_matches[0]}'? Available: {available_cols}"
+                    )
                 else:
-                    print(f"🔴 ERROR: Color mapping failed! Column '{color_col}' not found.")
-                    print(f"   Available columns: {available_cols}")
+                    warnings.warn(
+                        f"Color mapping failed: column '{color_col}' not found. "
+                        f"Available: {available_cols}"
+                    )
         return {}
     
     def _render(self, data, combined_aes, ggplot_obj):
@@ -537,121 +544,37 @@ class geom_smooth(GeomLayer):
                 line_width=2
             )
         else:
-            # Simple smoothing (moving average approximation)
+            # LOWESS smoothing via scipy or sklearn
+            from scipy.interpolate import UnivariateSpline
+
             sorted_data = clean_data.sort_values(x_col)
-            
-            # Use rolling mean for smoothing
-            window_size = max(1, len(sorted_data) // 10)
-            smoothed = sorted_data.rolling(window=window_size, center=True).mean().dropna()
-            
-            return hv.Curve(smoothed[[x_col, y_col]].rename(columns={x_col: 'x', y_col: 'y'})).opts(
+            x_sorted = sorted_data[x_col].values
+            y_sorted = sorted_data[y_col].values
+
+            x_smooth = np.linspace(x_sorted.min(), x_sorted.max(), 200)
+
+            try:
+                # Use UnivariateSpline with automatic smoothing
+                # s parameter controls smoothing; None = auto
+                spline = UnivariateSpline(x_sorted, y_sorted, s=len(x_sorted))
+                y_smooth = spline(x_smooth)
+            except Exception:
+                # Final fallback: rolling mean
+                window = max(1, len(sorted_data) // 10)
+                smoothed = sorted_data.rolling(window=window, center=True).mean().dropna()
+                x_smooth = smoothed[x_col].values
+                y_smooth = smoothed[y_col].values
+
+            smooth_df = pd.DataFrame({'x': x_smooth, 'y': y_smooth})
+            return hv.Curve(smooth_df).opts(
                 color=color,
                 alpha=self.params['alpha'],
                 line_width=2
             )
 
 
-class geom_boxplot(GeomLayer):
-    """Box plots
-    
-    Args:
-        mapping: Aesthetic mappings  
-        data: Data for this layer
-        alpha: Transparency
-        fill: Fill color
-        color: Border color
-        **kwargs: Additional parameters
-    """
-    
-    def __init__(self, mapping=None, data=None, alpha=1.0, fill=None, color=None, **kwargs):
-        super().__init__(mapping, data, **kwargs)
-        self.params.update({
-            'alpha': alpha,
-            'fill': fill,
-            'color': color
-        })
-    
-    def _render(self, data, combined_aes, ggplot_obj):
-        if 'x' not in combined_aes.mappings or 'y' not in combined_aes.mappings:
-            raise ValueError("geom_boxplot requires both x and y aesthetics")
-        
-        x_col = combined_aes.mappings['x']
-        y_col = combined_aes.mappings['y']
-        
-        if x_col not in data.columns or y_col not in data.columns:
-            warnings.warn(f"Required columns not found: {x_col}, {y_col}")
-            return None
-        
-        # Group data by x variable
-        grouped = data.groupby(x_col)[y_col]
-        
-        boxplot_data = []
-        for name, group in grouped:
-            values = group.dropna()
-            if len(values) > 0:
-                boxplot_data.append((name, values.tolist()))
-        
-        if not boxplot_data:
-            return None
-        
-        color = self.params.get('fill') or self.params.get('color') or '#1f77b4'
-        
-        return hv.BoxWhisker(boxplot_data).opts(
-            box_color=color,
-            alpha=self.params['alpha'],
-            tools=['hover']
-        )
-
-
-class geom_density(GeomLayer):
-    """Density plots
-    
-    Args:
-        mapping: Aesthetic mappings
-        data: Data for this layer  
-        alpha: Transparency
-        fill: Fill color
-        color: Line color
-        **kwargs: Additional parameters
-    """
-    
-    def __init__(self, mapping=None, data=None, alpha=0.5, fill=None, color=None, **kwargs):
-        super().__init__(mapping, data, **kwargs)
-        self.params.update({
-            'alpha': alpha,
-            'fill': fill,
-            'color': color
-        })
-    
-    def _render(self, data, combined_aes, ggplot_obj):
-        """Apply density plots"""
-        if 'x' not in combined_aes.mappings:
-            raise ValueError("geom_density requires x aesthetic")
-        
-        x_col = combined_aes.mappings['x']
-        
-        if x_col not in data.columns:
-            warnings.warn(f"Column '{x_col}' not found in data")
-            return None
-        
-        x_data = data[x_col].dropna()
-        
-        if len(x_data) == 0:
-            return None
-        
-        # Simple kernel density estimation using histogram
-        hist, edges = np.histogram(x_data, bins=50, density=True)
-        centers = (edges[:-1] + edges[1:]) / 2
-        
-        density_data = pd.DataFrame({'x': centers, 'y': hist})
-        
-        color = self.params.get('color', '#1f77b4')
-        
-        return hv.Area(density_data).opts(
-            color=color,
-            alpha=self.params['alpha'],
-            tools=['hover']
-        )
+# geom_boxplot and geom_density are defined in their own modules
+# (geom_boxplot.py and geom_density.py) to avoid duplication.
 
 
 class geom_area(GeomLayer):
@@ -773,7 +696,5 @@ __all__ = [
     'geom_bar',
     'geom_histogram',
     'geom_smooth',
-    'geom_boxplot',
-    'geom_density',
     'geom_area',
 ]

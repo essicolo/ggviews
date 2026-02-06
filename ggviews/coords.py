@@ -139,41 +139,7 @@ class coord_equal(coord_fixed):
         super().__init__(ratio=1, xlim=xlim, ylim=ylim, expand=expand, **kwargs)
 
 
-class coord_flip(CoordSystem):
-    """Flipped coordinate system
-    
-    Swaps the x and y axes. This is useful for creating horizontal bar charts
-    from vertical ones, or for making long axis labels more readable.
-    
-    Args:
-        xlim: X-axis limits (will become y-axis after flip)
-        ylim: Y-axis limits (will become x-axis after flip)
-        **kwargs: Additional parameters
-    """
-    
-    def __init__(self, xlim=None, ylim=None, **kwargs):
-        super().__init__(**kwargs)
-        self.xlim = xlim
-        self.ylim = ylim
-    
-    def _apply(self, plot, ggplot_obj):
-        """Apply coordinate flip"""
-        # This would require more complex transformation of the underlying data
-        # For now, provide a basic implementation that swaps axis labels
-        opts = {}
-        
-        if self.xlim is not None:
-            opts['ylim'] = self.xlim  # Swapped
-        if self.ylim is not None:
-            opts['xlim'] = self.ylim  # Swapped
-            
-        # Note: Full coord_flip would require transforming the data itself
-        # This is a simplified version
-        warnings.warn("coord_flip() is partially implemented. Full data transformation not yet available.")
-        
-        if opts:
-            return plot.opts(**opts)
-        return plot
+# coord_flip is defined in coord_flip.py to avoid duplication
 
 
 class coord_trans(CoordSystem):
@@ -262,7 +228,6 @@ __all__ = [
     'coord_cartesian',
     'coord_fixed', 
     'coord_equal',
-    'coord_flip',
     'coord_trans',
     'coord_polar',
     'coord_quickmap',

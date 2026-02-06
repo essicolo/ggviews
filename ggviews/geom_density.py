@@ -83,7 +83,7 @@ class geom_density(GeomLayer):
         try:
             kde = stats.gaussian_kde(values, bw_method=bandwidth)
             density = kde(x_eval)
-        except:
+        except Exception:
             # Fallback to simple histogram-based density
             hist, bin_edges = np.histogram(values, bins=min(50, len(values)//2), density=True)
             bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2

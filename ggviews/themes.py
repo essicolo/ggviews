@@ -166,8 +166,7 @@ class theme_dark(Theme):
     def _apply(self, plot, ggplot_obj):
         """Apply dark theme with appropriate text colors"""
         opts = self.options.copy()
-        
-        # Apply dark styling - use all keyword arguments
+
         styled_plot = plot.opts(
             width=opts.pop('width', 500),
             height=opts.pop('height', 400),
@@ -177,11 +176,8 @@ class theme_dark(Theme):
             show_frame=opts.pop('show_frame', False),
             toolbar=opts.pop('toolbar', 'above'),
             tools=opts.pop('tools', ['pan', 'wheel_zoom', 'box_zoom', 'reset', 'save']),
-            # Text colors for dark theme
-            fontcolor='white',
-            **opts
         )
-        
+
         return styled_plot
 
 
