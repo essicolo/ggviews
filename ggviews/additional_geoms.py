@@ -150,52 +150,38 @@ class geom_violin(GeomLayer):
         })
     
     def _render(self, data, combined_aes, ggplot_obj):
-        """Render violin plot"""
+        """Render violin plot using HoloViews Violin element"""
         if 'x' not in combined_aes.mappings or 'y' not in combined_aes.mappings:
             raise ValueError("geom_violin requires both x and y aesthetics")
-        
+
         x_col = combined_aes.mappings['x']
         y_col = combined_aes.mappings['y']
-        
+
         if x_col not in data.columns or y_col not in data.columns:
             warnings.warn(f"Required columns not found: {x_col}, {y_col}")
             return None
-        
-        # For now, create a simplified violin using density approximation
-        # In a full implementation, this would use proper KDE
-        grouped = data.groupby(x_col)[y_col]
-        
-        plot_data = []
-        for name, group in grouped:
-            values = group.dropna()
-            if len(values) > 1:
-                # Simple density approximation with histogram
-                hist, edges = np.histogram(values, bins=20, density=True)
-                centers = (edges[:-1] + edges[1:]) / 2
-                
-                # Create violin shape (symmetric density)
-                violin_data = []
-                for i, (center, density) in enumerate(zip(centers, hist)):
-                    # Scale density to create violin width
-                    width = density * 0.4  # Adjust width scaling
-                    violin_data.extend([
-                        (name - width, center),
-                        (name + width, center)
-                    ])
-                
-                if violin_data:
-                    violin_df = pd.DataFrame(violin_data, columns=['x', 'y'])
-                    color = self.params.get('fill', ggplot_obj.default_colors[0])
-                    
-                    violin = hv.Area(violin_df).opts(
-                        color=color,
-                        alpha=self.params['alpha']
-                    )
-                    plot_data.append(violin)
-        
-        if plot_data:
-            return hv.Overlay(plot_data)
-        return None
+
+        # Use HoloViews Violin element which handles categorical x properly
+        violin_data = data[[x_col, y_col]].dropna()
+        if violin_data.empty:
+            return None
+
+        color = self.params.get('fill') or self.params.get('color') or ggplot_obj.default_colors[0]
+
+        try:
+            return hv.Violin(violin_data, kdims=[x_col], vdims=[y_col]).opts(
+                violin_fill_color=color,
+                violin_fill_alpha=self.params['alpha'],
+                inner='box',
+                tools=['hover'],
+            )
+        except Exception:
+            # Fallback: use BoxWhisker if Violin is not available
+            return hv.BoxWhisker(violin_data, kdims=[x_col], vdims=[y_col]).opts(
+                box_fill_color=color,
+                box_alpha=self.params['alpha'],
+                tools=['hover'],
+            )
 
 
 class geom_text(GeomLayer):
@@ -242,49 +228,42 @@ class geom_text(GeomLayer):
         })
     
     def _render(self, data, combined_aes, ggplot_obj):
-        """Render text annotations"""
+        """Render text annotations using hv.Labels"""
         required_aes = ['x', 'y', 'label']
         for aes_name in required_aes:
             if aes_name not in combined_aes.mappings:
                 raise ValueError(f"geom_text requires {aes_name} aesthetic")
-        
+
         x_col = combined_aes.mappings['x']
         y_col = combined_aes.mappings['y']
         label_col = combined_aes.mappings['label']
-        
-        missing_cols = [col for col in [x_col, y_col, label_col] 
+
+        missing_cols = [col for col in [x_col, y_col, label_col]
                        if col not in data.columns]
         if missing_cols:
             warnings.warn(f"Required columns not found: {missing_cols}")
             return None
-        
+
         # Apply nudging
         x_data = data[x_col] + self.params['nudge_x']
         y_data = data[y_col] + self.params['nudge_y']
         labels = data[label_col].astype(str)
-        
-        # Create text elements
-        text_data = []
-        for x, y, label in zip(x_data, y_data, labels):
-            if pd.notna(x) and pd.notna(y) and pd.notna(label):
-                text_data.append((x, y, str(label)))
-        
-        if text_data:
-            text_color = self.params.get('color', 'black')
-            text_size = self.params.get('size', 12)
-            
-            # Note: This is a simplified implementation
-            # Full holoviews text support would use hv.Text elements
-            text_df = pd.DataFrame(text_data, columns=['x', 'y', 'text'])
-            
-            # For now, represent as points with hover text
-            # In a full implementation, this would render actual text
-            return hv.Scatter(text_df, vdims=['text']).opts(
-                color=text_color,
-                size=text_size//2,
-                alpha=self.params['alpha'],
-                tools=['hover']
-            )
+
+        text_color = self.params.get('color', 'black')
+        text_size = self.params.get('size', 12)
+
+        # Build label data
+        label_data = pd.DataFrame({'x': x_data, 'y': y_data, 'text': labels}).dropna()
+
+        if label_data.empty:
+            return None
+
+        # Use hv.Labels for proper text rendering
+        return hv.Labels(label_data, kdims=['x', 'y'], vdims=['text']).opts(
+            text_color=text_color,
+            text_font_size=f'{text_size}pt',
+            text_alpha=self.params['alpha'],
+        )
 
 
 class geom_errorbar(GeomLayer):
@@ -371,33 +350,51 @@ class geom_errorbar(GeomLayer):
 
 class geom_label(geom_text):
     """Text labels with background boxes
-    
+
     Similar to geom_text but with background rectangles for better readability.
-    
+
     Args:
-        mapping: Aesthetic mappings (x, y, label, color, fill)  
+        mapping: Aesthetic mappings (x, y, label, color, fill)
         data: Data for this layer
-        label_padding: Padding around text
+        label_padding: Padding around text (in data units)
         label_r: Corner radius of label box
         fill: Background fill color
         color: Text color
         **kwargs: Additional parameters inherited from geom_text
     """
-    
-    def __init__(self, mapping=None, data=None, label_padding=0.25, 
+
+    def __init__(self, mapping=None, data=None, label_padding=0.25,
                  label_r=0.15, fill='white', color='black', **kwargs):
         super().__init__(mapping, data, color=color, **kwargs)
         self.params.update({
             'label_padding': label_padding,
             'label_r': label_r,
-            'fill': fill
+            'fill': fill,
         })
-    
+
     def _render(self, data, combined_aes, ggplot_obj):
-        """Render labels with background boxes"""
-        # For now, use the same implementation as geom_text
-        # A full implementation would add background rectangles
-        return super()._render(data, combined_aes, ggplot_obj)
+        """Render labels with background boxes via a Bokeh hook."""
+        labels_el = super()._render(data, combined_aes, ggplot_obj)
+        if labels_el is None:
+            return None
+
+        bg_fill = self.params.get('fill', 'white')
+        bg_alpha = 0.8
+
+        def _add_background(plot, element):
+            """Bokeh post-render hook that sets background on text glyphs."""
+            for renderer in plot.state.renderers:
+                glyph = getattr(renderer, 'glyph', None)
+                if glyph is None:
+                    continue
+                if hasattr(glyph, 'background_fill_color'):
+                    glyph.background_fill_color = bg_fill
+                    glyph.background_fill_alpha = bg_alpha
+                    if hasattr(glyph, 'border_line_color'):
+                        glyph.border_line_color = 'gray'
+                        glyph.border_line_alpha = 0.5
+
+        return labels_el.opts(hooks=[_add_background])
 
 
 # Export all additional geoms

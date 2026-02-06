@@ -148,26 +148,6 @@ class ylim(UtilityLayer):
         ggplot_obj.limits['y'] = self.params['limits']
 
 
-class coord_flip(UtilityLayer):
-    """Flip the coordinate system
-    
-    Swaps the x and y axes. Useful for creating horizontal bar charts
-    from vertical ones.
-    
-    Example:
-        ggplot(df, aes(x='category', y='value')).geom_bar() + coord_flip()
-    """
-    
-    def __init__(self):
-        super().__init__()
-    
-    def _apply_to_ggplot(self, ggplot_obj):
-        """Apply coordinate flip to ggplot object"""
-        # This would need to be implemented in the rendering logic
-        # For now, store a flag
-        ggplot_obj.coord_flip = True
-
-
 def expand_limits(**kwargs):
     """Expand the plot limits to include additional values
     
@@ -329,7 +309,6 @@ __all__ = [
     'labs',
     'xlim',
     'ylim',
-    'coord_flip',
     'expand_limits',
     'guides',
     'guide_legend',
