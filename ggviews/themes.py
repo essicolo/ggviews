@@ -289,10 +289,10 @@ class theme_essi(Theme):
     """Essi theme — modern, warm, colorblind-friendly.
 
     * **Background**: warm beige (#EFEBE5), same luminance as ggplot2's default gray.
-    * **Grid**: subtle warm gray, low alpha.
+    * **Grid**: white major + minor gridlines (ggplot2 default style).
     * **Palette**: Krzywinski / BCGSC 8-color colorblind-safe palette,
       expandable to any number of colors via ``palette_essi(n)``.
-    * **Typography**: clean, no bold frames.
+    * **Typography**: clean, non-italic, no bold frames.
 
     Examples
     --------
@@ -326,7 +326,24 @@ class theme_essi(Theme):
         """Add theme and immediately swap the color palette."""
         new_plot = super()._add_to_ggplot(ggplot_obj)
         new_plot.default_colors = palette_essi(max(len(new_plot.default_colors), 8))
+        new_plot._hooks.append(self._mpl_grid_hook)
         return new_plot
+
+    @staticmethod
+    def _mpl_grid_hook(plot, element):
+        """Matplotlib hook: beige background + white major/minor grid."""
+        ax = getattr(plot, 'handles', {}).get('axis')
+        if not ax or not hasattr(ax, 'transAxes'):
+            return
+        ax.set_facecolor('#EFEBE5')
+        ax.grid(True, which='major', color='white', linewidth=1.4, alpha=1.0)
+        ax.minorticks_on()
+        ax.grid(True, which='minor', color='white', linewidth=0.6, alpha=0.7)
+        # Non-italic axis labels
+        ax.xaxis.label.set_fontstyle('normal')
+        ax.yaxis.label.set_fontstyle('normal')
+        for lbl in ax.get_xticklabels() + ax.get_yticklabels():
+            lbl.set_fontstyle('normal')
 
     def _apply(self, plot, ggplot_obj):
         """Apply the Essi theme styling."""

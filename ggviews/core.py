@@ -95,6 +95,7 @@ class ggplot:
         self.highlight = None     # gghighlight support
         self.labels = {}
         self.limits = {}
+        self._hooks = []          # cross-backend rendering hooks
         
         # Default theme colors (ggplot2-like)
         self.default_colors = [
@@ -134,6 +135,7 @@ class ggplot:
         new_plot.highlight = self.highlight        # Copy highlight
         new_plot.labels = self.labels.copy()
         new_plot.limits = self.limits.copy()
+        new_plot._hooks = self._hooks.copy()
         return new_plot
     
     def _get_data_for_layer(self, layer_data=None):
@@ -273,7 +275,19 @@ class ggplot:
         # Apply facets
         if self.facets:
             final_plot = self.facets._apply(final_plot, self)
-        
+
+        # Collect and apply rendering hooks.
+        # Faceted plots get per-panel hooks via facets.py; non-faceted plots
+        # need the italic fix applied here.  Theme hooks (e.g. theme_essi
+        # grid styling) are accumulated on self._hooks during composition.
+        if not self.facets:
+            try:
+                from .facets import _fix_label_style
+                all_hooks = list(self._hooks) + [_fix_label_style]
+                final_plot = final_plot.opts(hooks=all_hooks)
+            except Exception:
+                pass
+
         return final_plot
     
     def show(self):
