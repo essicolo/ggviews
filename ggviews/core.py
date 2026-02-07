@@ -365,6 +365,16 @@ class ggplot:
         """Add error bars to the plot"""
         from .additional_geoms import geom_errorbar
         return geom_errorbar(mapping=mapping, **kwargs)._add_to_ggplot(self)
+
+    def geom_text_repel(self, mapping=None, **kwargs):
+        """Add text labels with automatic repulsion to avoid overlaps"""
+        from .repel import geom_text_repel
+        return geom_text_repel(mapping=mapping, **kwargs)._add_to_ggplot(self)
+
+    def geom_label_repel(self, mapping=None, **kwargs):
+        """Add labels with background boxes and automatic repulsion"""
+        from .repel import geom_label_repel
+        return geom_label_repel(mapping=mapping, **kwargs)._add_to_ggplot(self)
     
     def geom_map(self, mapping=None, **kwargs):
         """Add geographic map to the plot"""
