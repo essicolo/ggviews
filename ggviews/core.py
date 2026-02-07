@@ -92,6 +92,7 @@ class ggplot:
         self.theme = None
         self.facets = None
         self.coord_system = None  # Add coordinate system support
+        self.highlight = None     # gghighlight support
         self.labels = {}
         self.limits = {}
         
@@ -130,6 +131,7 @@ class ggplot:
         new_plot.theme = self.theme
         new_plot.facets = self.facets
         new_plot.coord_system = self.coord_system  # Copy coordinate system
+        new_plot.highlight = self.highlight        # Copy highlight
         new_plot.labels = self.labels.copy()
         new_plot.limits = self.limits.copy()
         return new_plot
@@ -203,8 +205,12 @@ class ggplot:
                 if pos_obj is not None:
                     layer_data = pos_obj.adjust(layer_data.copy(), combined_aes, layer.params)
 
-            # Render layer
-            layer_plot = layer._render(layer_data, combined_aes, self)
+            # Render layer (with highlight if active)
+            if self.highlight is not None:
+                layer_plot = self.highlight._render_layer_highlighted(
+                    layer, layer_data, combined_aes, self)
+            else:
+                layer_plot = layer._render(layer_data, combined_aes, self)
             if layer_plot is not None:
                 plots.append(layer_plot)
         
@@ -376,6 +382,11 @@ class ggplot:
         from .repel import geom_label_repel
         return geom_label_repel(mapping=mapping, **kwargs)._add_to_ggplot(self)
     
+    def gghighlight(self, predicate, **kwargs):
+        """Highlight data matching a predicate, gray out the rest"""
+        from .highlight import gghighlight
+        return gghighlight(predicate, **kwargs)._add_to_ggplot(self)
+
     def geom_map(self, mapping=None, **kwargs):
         """Add geographic map to the plot"""
         from .geom_map import geom_map
