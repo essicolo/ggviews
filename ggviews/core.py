@@ -233,17 +233,32 @@ class ggplot:
                 gridstyle={'grid_line_alpha': 0.3}
             )
         
-        # Apply labels
+        # Apply labels — default to aes column names, then explicit labs() overrides
+        label_opts = {}
+
+        # Default axis labels from global aesthetic mappings (ggplot2 behaviour)
+        if self.mapping:
+            x_col = self.mapping.mappings.get('x')
+            y_col = self.mapping.mappings.get('y')
+            if x_col:
+                label_opts['xlabel'] = str(x_col)
+            if y_col:
+                label_opts['ylabel'] = str(y_col)
+
+        # Explicit labs() take precedence
         if self.labels:
-            opts = {}
             if 'title' in self.labels:
-                opts['title'] = self.labels['title']
+                label_opts['title'] = self.labels['title']
             if 'x' in self.labels:
-                opts['xlabel'] = self.labels['x']
+                label_opts['xlabel'] = self.labels['x']
             if 'y' in self.labels:
-                opts['ylabel'] = self.labels['y']
-            if opts:
-                final_plot = final_plot.opts(**opts)
+                label_opts['ylabel'] = self.labels['y']
+
+        if label_opts:
+            try:
+                final_plot = final_plot.opts(**label_opts)
+            except Exception:
+                pass
         
         # Apply limits
         if 'x' in self.limits:

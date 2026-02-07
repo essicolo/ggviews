@@ -49,6 +49,18 @@ class coord_flip(CoordSystem):
             if self.xlim is not None:
                 opts_kwargs['ylim'] = self.xlim
 
+            # Swap axis labels so they stay with the correct data dimension
+            if ggplot_obj and ggplot_obj.mapping:
+                x_col = ggplot_obj.mapping.mappings.get('x')
+                y_col = ggplot_obj.mapping.mappings.get('y')
+                x_label = ggplot_obj.labels.get('x', str(x_col) if x_col else None)
+                y_label = ggplot_obj.labels.get('y', str(y_col) if y_col else None)
+                # After invert_axes, the rendered x-axis shows y data and vice versa
+                if y_label:
+                    opts_kwargs['xlabel'] = y_label
+                if x_label:
+                    opts_kwargs['ylabel'] = x_label
+
             if opts_kwargs:
                 flipped_plot = flipped_plot.opts(**opts_kwargs)
 

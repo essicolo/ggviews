@@ -167,6 +167,11 @@ class facet_wrap(Facet):
 
             # Build a flat Layout and set the column count once
             layout = hv.Layout(panels).cols(ncol)
+            # Suppress HoloViews "A","B","C" subplot labels (not ggplot2 style)
+            try:
+                layout = layout.opts(sublabel_format='')
+            except Exception:
+                pass
             return layout
 
         except Exception as e:
@@ -252,6 +257,11 @@ class facet_grid(Facet):
                 return plot
 
             layout = hv.Layout(panels).cols(ncol)
+            # Suppress HoloViews "A","B","C" subplot labels (not ggplot2 style)
+            try:
+                layout = layout.opts(sublabel_format='')
+            except Exception:
+                pass
             return layout
 
         except Exception as e:

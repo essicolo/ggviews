@@ -433,12 +433,16 @@ class geom_bar(GeomLayer):
         
         # Single color bars (no fill mapping)
         color = self.params.get('fill') or self.params.get('color') or '#1f77b4'
-        
-        return hv.Bars(plot_data).opts(
+
+        bar_plot = hv.Bars(plot_data).opts(
             color=color,
             alpha=self.params['alpha'],
             tools=['hover']
         )
+        # Set default y-axis label for count stat (ggplot2 says "count")
+        if self.stat == 'count':
+            bar_plot = bar_plot.opts(ylabel='count')
+        return bar_plot
 
 
 class geom_histogram(GeomLayer):
