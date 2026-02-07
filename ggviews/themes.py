@@ -303,12 +303,17 @@ class theme_essi(Theme):
         default_options = {
             'width': 500,
             'height': 400,
-            'bgcolor': '#FAF6F1',       # pale beige (Anthropic-inspired)
+            'bgcolor': '#FAF6F1',       # pale beige
             'show_grid': True,
             'gridstyle': {
-                'grid_line_color': '#E0D8CF',  # warm gray grid
-                'grid_line_alpha': 0.6,
-                'grid_line_width': 1,
+                # Major grid: thin white lines (ggplot2 default style)
+                'grid_line_color': 'white',
+                'grid_line_width': 1.4,
+                'grid_line_alpha': 1.0,
+                # Minor grid: even thinner white lines
+                'minor_grid_line_color': 'white',
+                'minor_grid_line_width': 0.6,
+                'minor_grid_line_alpha': 0.7,
             },
             'show_frame': False,
             'toolbar': 'above',
