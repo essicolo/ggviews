@@ -2,15 +2,29 @@
 ggviews: A ggplot2-style API for holoviews
 
 A grammar of graphics implementation for holoviews that provides
-a familiar ggplot2-like interface with method chaining.
+a familiar ggplot2-like interface.
 
-Usage:
-    from ggviews import ggplot, aes
+Usage (method chaining)::
 
-    (ggplot(df)
-     .geom_point(aes(x='height', y='weight', color='species'))
-     .theme_minimal()
-     .labs(title='Height vs Weight by Species'))
+    import ggviews as gv
+
+    (
+        gv.ggplot(df, gv.aes(x='height', y='weight', color='species'))
+        .geom_point()
+        .theme_minimal()
+        .labs(title='Height vs Weight by Species')
+    )
+
+Usage (+ operator, ggplot2 style)::
+
+    import ggviews as gv
+
+    (
+        gv.ggplot(df, gv.aes(x='height', y='weight', color='species'))
+        + gv.geom_point()
+        + gv.theme_minimal()
+        + gv.labs(title='Height vs Weight by Species')
+    )
 """
 
 # Core
