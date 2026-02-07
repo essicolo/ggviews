@@ -31,7 +31,7 @@ from .repel import geom_text_repel, geom_label_repel
 from .highlight import gghighlight
 
 # Themes
-from .themes import theme_minimal, theme_classic, theme_bw, theme_dark, theme_void
+from .themes import theme_minimal, theme_classic, theme_bw, theme_dark, theme_void, theme_essi, palette_essi
 
 # Theme elements (canonical source: advanced_themes.py)
 from .advanced_themes import element_blank, element_text, element_line, element_rect, AdvancedTheme
@@ -93,6 +93,7 @@ __all__ = [
     'gghighlight',
     # Themes
     'theme_minimal', 'theme_classic', 'theme_bw', 'theme_dark', 'theme_void',
+    'theme_essi', 'palette_essi',
     'theme', 'element_blank', 'element_text', 'element_line', 'element_rect',
     'AdvancedTheme',
     # Scales

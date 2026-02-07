@@ -468,6 +468,11 @@ class ggplot:
         from .themes import theme_void
         return theme_void(**kwargs)._add_to_ggplot(self)
 
+    def theme_essi(self, **kwargs):
+        """Apply Essi theme (beige background, colorblind-safe palette)"""
+        from .themes import theme_essi
+        return theme_essi(**kwargs)._add_to_ggplot(self)
+
     # Method chaining for scales
     def scale_color_manual(self, **kwargs):
         """Apply manual color scale"""
