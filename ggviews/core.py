@@ -291,8 +291,19 @@ class ggplot:
         return final_plot
     
     def show(self):
-        """Display the plot"""
+        """Render and display the plot.
+
+        Works in Jupyter notebooks, jupytext, VSCode interactive,
+        and any IPython-based environment.  Returns the rendered
+        HoloViews object so the call can still be captured in a
+        variable if needed.
+        """
         plot = self._render()
+        try:
+            from IPython.display import display
+            display(plot)
+        except ImportError:
+            pass
         return plot
     
     def _repr_mimebundle_(self, include=None, exclude=None):
