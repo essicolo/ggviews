@@ -35,6 +35,31 @@ class coord_flip(CoordSystem):
         self.ylim = ylim
         self.expand = expand
 
+    @staticmethod
+    def _swap_ticks_hook(plot, element):
+        """Bokeh hook: copy custom xticks to the y-axis after invert_axes.
+
+        When invert_axes=True, the original x-axis data is rendered on the
+        visual y-axis, but HoloViews' xticks override only applies to the
+        visual x-axis.  This hook moves them.
+        """
+        fig = plot.state
+        x_axis = fig.xaxis[0] if fig.xaxis else None
+        y_axis = fig.yaxis[0] if fig.yaxis else None
+        if x_axis and y_axis:
+            # If the original axis had custom tick overrides (e.g. category labels)
+            # and they ended up on the wrong axis after inversion, swap them.
+            x_major = getattr(x_axis, 'major_label_overrides', {})
+            y_major = getattr(y_axis, 'major_label_overrides', {})
+            if x_major and not y_major:
+                y_axis.major_label_overrides = x_major
+                x_axis.major_label_overrides = {}
+            # Also handle ticker
+            x_ticker = getattr(x_axis, 'ticker', None)
+            if x_ticker and hasattr(x_ticker, 'ticks') and x_ticker.ticks:
+                from bokeh.models import FixedTicker
+                y_axis.ticker = FixedTicker(ticks=list(x_ticker.ticks))
+
     def _apply(self, plot, ggplot_obj):
         """Apply coordinate flipping to the plot"""
         if plot is None:
@@ -63,6 +88,12 @@ class coord_flip(CoordSystem):
 
             if opts_kwargs:
                 flipped_plot = flipped_plot.opts(**opts_kwargs)
+
+            # Add hook to swap custom tick labels to the correct axis
+            try:
+                flipped_plot = flipped_plot.opts(hooks=[self._swap_ticks_hook])
+            except Exception:
+                pass
 
             return flipped_plot
         except Exception:

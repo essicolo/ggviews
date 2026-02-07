@@ -41,11 +41,31 @@ class Facet:
         else:
             return None, formula
 
+    @staticmethod
+    def _strip_hook(plot, element):
+        """Bokeh hook: style the panel title as a ggplot2-style strip label.
+
+        Adds a gray background fill to the title text so it resembles
+        the colored strip bars in ggplot2 facets.
+        """
+        fig = plot.state
+        if hasattr(fig, 'title') and fig.title:
+            fig.title.background_fill_color = '#E5E5E5'
+            fig.title.background_fill_alpha = 1.0
+            fig.title.text_font_size = '10pt'
+            fig.title.text_font_style = 'normal'  # ggplot2 strips are not bold
+            fig.title.align = 'center'
+            # Add a little padding via border
+            if hasattr(fig.title, 'border_line_color'):
+                fig.title.border_line_color = '#CCCCCC'
+                fig.title.border_line_alpha = 0.5
+
     def _render_facet_panel(self, facet_data, ggplot_obj, title):
         """Render a single facet panel with the given subset of data.
 
         Creates a copy of the ggplot object with filtered data and no faceting
-        to avoid recursion, then renders it and applies the facet title.
+        to avoid recursion, then renders it and applies the facet title
+        styled as a ggplot2-style strip label.
         """
         facet_ggplot = ggplot_obj._copy()
         facet_ggplot.data = facet_data
@@ -53,11 +73,17 @@ class Facet:
 
         panel = facet_ggplot._render()
         if panel is not None:
-            # Reduce panel size for multi-panel layouts
+            # Reduce panel size for multi-panel layouts and add strip hook
             try:
-                panel = panel.opts(title=str(title), width=350, height=280)
+                panel = panel.opts(
+                    title=str(title), width=350, height=280,
+                    hooks=[self._strip_hook],
+                )
             except Exception:
-                panel = panel.opts(title=str(title))
+                try:
+                    panel = panel.opts(title=str(title), hooks=[self._strip_hook])
+                except Exception:
+                    panel = panel.opts(title=str(title))
         return panel
 
     def _apply(self, plot, ggplot_obj):
