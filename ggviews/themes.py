@@ -288,7 +288,7 @@ def palette_essi(n=8):
 class theme_essi(Theme):
     """Essi theme — modern, warm, colorblind-friendly.
 
-    * **Background**: pale beige (#FAF6F1), inspired by Anthropic's brand.
+    * **Background**: warm beige (#EFEBE5), same luminance as ggplot2's default gray.
     * **Grid**: subtle warm gray, low alpha.
     * **Palette**: Krzywinski / BCGSC 8-color colorblind-safe palette,
       expandable to any number of colors via ``palette_essi(n)``.
@@ -303,7 +303,7 @@ class theme_essi(Theme):
         default_options = {
             'width': 500,
             'height': 400,
-            'bgcolor': '#FAF6F1',       # pale beige
+            'bgcolor': '#EFEBE5',       # warm beige (same luminance as ggplot2's #EBEBEB)
             'show_grid': True,
             'gridstyle': {
                 # Major grid: thin white lines (ggplot2 default style)
@@ -336,7 +336,7 @@ class theme_essi(Theme):
             styled_plot = plot.opts(
                 width=opts.pop('width', 500),
                 height=opts.pop('height', 400),
-                bgcolor=opts.pop('bgcolor', '#FAF6F1'),
+                bgcolor=opts.pop('bgcolor', '#EFEBE5'),
                 show_grid=opts.pop('show_grid', True),
                 gridstyle=opts.pop('gridstyle', {}),
                 show_frame=opts.pop('show_frame', False),
