@@ -197,6 +197,8 @@ class facet_wrap(Facet):
             # Suppress redundant axis labels (ggplot2 style):
             # - Only leftmost panels keep the y-axis label + ticks
             # - Only bottom-row panels keep the x-axis label + ticks
+            # Use yaxis=None / xaxis=None (not 'bare') so that tick labels
+            # are fully removed in the matplotlib backend used for PNG export.
             for idx, panel in enumerate(panels):
                 row_idx = idx // ncol
                 col_idx = idx % ncol
@@ -205,10 +207,10 @@ class facet_wrap(Facet):
                 strip_opts = {}
                 if not is_left:
                     strip_opts['ylabel'] = ''
-                    strip_opts['yaxis'] = 'bare'
+                    strip_opts['yaxis'] = None
                 if not is_bottom:
                     strip_opts['xlabel'] = ''
-                    strip_opts['xaxis'] = 'bare'
+                    strip_opts['xaxis'] = None
                 if strip_opts:
                     try:
                         panels[idx] = panel.opts(**strip_opts)
@@ -218,10 +220,16 @@ class facet_wrap(Facet):
             # Build a flat Layout and set the column count once
             layout = hv.Layout(panels).cols(ncol)
             # Suppress HoloViews "A","B","C" subplot labels (not ggplot2 style)
+            # and tighten inter-panel spacing (hspace/vspace for matplotlib).
             try:
-                layout = layout.opts(sublabel_format='')
+                layout = layout.opts(
+                    sublabel_format='', hspace=0.1, vspace=0.1,
+                )
             except Exception:
-                pass
+                try:
+                    layout = layout.opts(sublabel_format='')
+                except Exception:
+                    pass
             return layout
 
         except Exception as e:
@@ -319,10 +327,10 @@ class facet_grid(Facet):
                 strip_opts = {}
                 if not is_left:
                     strip_opts['ylabel'] = ''
-                    strip_opts['yaxis'] = 'bare'
+                    strip_opts['yaxis'] = None
                 if not is_bottom:
                     strip_opts['xlabel'] = ''
-                    strip_opts['xaxis'] = 'bare'
+                    strip_opts['xaxis'] = None
                 if strip_opts:
                     try:
                         panels[idx] = panel.opts(**strip_opts)
@@ -331,10 +339,16 @@ class facet_grid(Facet):
 
             layout = hv.Layout(panels).cols(ncol)
             # Suppress HoloViews "A","B","C" subplot labels (not ggplot2 style)
+            # and tighten inter-panel spacing (hspace/vspace for matplotlib).
             try:
-                layout = layout.opts(sublabel_format='')
+                layout = layout.opts(
+                    sublabel_format='', hspace=0.1, vspace=0.1,
+                )
             except Exception:
-                pass
+                try:
+                    layout = layout.opts(sublabel_format='')
+                except Exception:
+                    pass
             return layout
 
         except Exception as e:
