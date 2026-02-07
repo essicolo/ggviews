@@ -191,6 +191,30 @@ class facet_wrap(Facet):
             if not panels:
                 return plot
 
+            n_panels = len(panels)
+            nrow_actual = int(np.ceil(n_panels / ncol))
+
+            # Suppress redundant axis labels (ggplot2 style):
+            # - Only leftmost panels keep the y-axis label + ticks
+            # - Only bottom-row panels keep the x-axis label + ticks
+            for idx, panel in enumerate(panels):
+                row_idx = idx // ncol
+                col_idx = idx % ncol
+                is_left = (col_idx == 0)
+                is_bottom = (row_idx == nrow_actual - 1) or (idx + ncol >= n_panels)
+                strip_opts = {}
+                if not is_left:
+                    strip_opts['ylabel'] = ''
+                    strip_opts['yaxis'] = 'bare'
+                if not is_bottom:
+                    strip_opts['xlabel'] = ''
+                    strip_opts['xaxis'] = 'bare'
+                if strip_opts:
+                    try:
+                        panels[idx] = panel.opts(**strip_opts)
+                    except Exception:
+                        pass
+
             # Build a flat Layout and set the column count once
             layout = hv.Layout(panels).cols(ncol)
             # Suppress HoloViews "A","B","C" subplot labels (not ggplot2 style)
@@ -281,6 +305,29 @@ class facet_grid(Facet):
 
             if not panels:
                 return plot
+
+            nrow_actual = len(row_vals)
+
+            # Suppress redundant axis labels (ggplot2 style):
+            # - Only leftmost panels keep y-axis label + ticks
+            # - Only bottom-row panels keep x-axis label + ticks
+            for idx, panel in enumerate(panels):
+                row_idx = idx // ncol
+                col_idx = idx % ncol
+                is_left = (col_idx == 0)
+                is_bottom = (row_idx == nrow_actual - 1)
+                strip_opts = {}
+                if not is_left:
+                    strip_opts['ylabel'] = ''
+                    strip_opts['yaxis'] = 'bare'
+                if not is_bottom:
+                    strip_opts['xlabel'] = ''
+                    strip_opts['xaxis'] = 'bare'
+                if strip_opts:
+                    try:
+                        panels[idx] = panel.opts(**strip_opts)
+                    except Exception:
+                        pass
 
             layout = hv.Layout(panels).cols(ncol)
             # Suppress HoloViews "A","B","C" subplot labels (not ggplot2 style)
