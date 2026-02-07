@@ -25,9 +25,13 @@ from .geom_density import geom_density
 from .geom_tile import geom_tile, geom_raster
 from .geom_map import geom_map
 from .additional_geoms import geom_ribbon, geom_violin, geom_text, geom_label, geom_errorbar
+from .repel import geom_text_repel, geom_label_repel
+
+# Highlight
+from .highlight import gghighlight
 
 # Themes
-from .themes import theme_minimal, theme_classic, theme_bw, theme_dark, theme_void
+from .themes import theme_minimal, theme_classic, theme_bw, theme_dark, theme_void, theme_essi, palette_essi
 
 # Theme elements (canonical source: advanced_themes.py)
 from .advanced_themes import element_blank, element_text, element_line, element_rect, AdvancedTheme
@@ -84,8 +88,12 @@ __all__ = [
     'geom_area', 'geom_boxplot', 'geom_density', 'geom_tile', 'geom_raster',
     'geom_map', 'geom_ribbon', 'geom_violin', 'geom_text', 'geom_label',
     'geom_errorbar', 'geom_smooth_enhanced',
+    'geom_text_repel', 'geom_label_repel',
+    # Highlight
+    'gghighlight',
     # Themes
     'theme_minimal', 'theme_classic', 'theme_bw', 'theme_dark', 'theme_void',
+    'theme_essi', 'palette_essi',
     'theme', 'element_blank', 'element_text', 'element_line', 'element_rect',
     'AdvancedTheme',
     # Scales

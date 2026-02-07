@@ -92,6 +92,7 @@ class ggplot:
         self.theme = None
         self.facets = None
         self.coord_system = None  # Add coordinate system support
+        self.highlight = None     # gghighlight support
         self.labels = {}
         self.limits = {}
         
@@ -130,6 +131,7 @@ class ggplot:
         new_plot.theme = self.theme
         new_plot.facets = self.facets
         new_plot.coord_system = self.coord_system  # Copy coordinate system
+        new_plot.highlight = self.highlight        # Copy highlight
         new_plot.labels = self.labels.copy()
         new_plot.limits = self.limits.copy()
         return new_plot
@@ -203,8 +205,12 @@ class ggplot:
                 if pos_obj is not None:
                     layer_data = pos_obj.adjust(layer_data.copy(), combined_aes, layer.params)
 
-            # Render layer
-            layer_plot = layer._render(layer_data, combined_aes, self)
+            # Render layer (with highlight if active)
+            if self.highlight is not None:
+                layer_plot = self.highlight._render_layer_highlighted(
+                    layer, layer_data, combined_aes, self)
+            else:
+                layer_plot = layer._render(layer_data, combined_aes, self)
             if layer_plot is not None:
                 plots.append(layer_plot)
         
@@ -227,17 +233,32 @@ class ggplot:
                 gridstyle={'grid_line_alpha': 0.3}
             )
         
-        # Apply labels
+        # Apply labels — default to aes column names, then explicit labs() overrides
+        label_opts = {}
+
+        # Default axis labels from global aesthetic mappings (ggplot2 behaviour)
+        if self.mapping:
+            x_col = self.mapping.mappings.get('x')
+            y_col = self.mapping.mappings.get('y')
+            if x_col:
+                label_opts['xlabel'] = str(x_col)
+            if y_col:
+                label_opts['ylabel'] = str(y_col)
+
+        # Explicit labs() take precedence
         if self.labels:
-            opts = {}
             if 'title' in self.labels:
-                opts['title'] = self.labels['title']
+                label_opts['title'] = self.labels['title']
             if 'x' in self.labels:
-                opts['xlabel'] = self.labels['x']
+                label_opts['xlabel'] = self.labels['x']
             if 'y' in self.labels:
-                opts['ylabel'] = self.labels['y']
-            if opts:
-                final_plot = final_plot.opts(**opts)
+                label_opts['ylabel'] = self.labels['y']
+
+        if label_opts:
+            try:
+                final_plot = final_plot.opts(**label_opts)
+            except Exception:
+                pass
         
         # Apply limits
         if 'x' in self.limits:
@@ -365,7 +386,22 @@ class ggplot:
         """Add error bars to the plot"""
         from .additional_geoms import geom_errorbar
         return geom_errorbar(mapping=mapping, **kwargs)._add_to_ggplot(self)
+
+    def geom_text_repel(self, mapping=None, **kwargs):
+        """Add text labels with automatic repulsion to avoid overlaps"""
+        from .repel import geom_text_repel
+        return geom_text_repel(mapping=mapping, **kwargs)._add_to_ggplot(self)
+
+    def geom_label_repel(self, mapping=None, **kwargs):
+        """Add labels with background boxes and automatic repulsion"""
+        from .repel import geom_label_repel
+        return geom_label_repel(mapping=mapping, **kwargs)._add_to_ggplot(self)
     
+    def gghighlight(self, predicate, **kwargs):
+        """Highlight data matching a predicate, gray out the rest"""
+        from .highlight import gghighlight
+        return gghighlight(predicate, **kwargs)._add_to_ggplot(self)
+
     def geom_map(self, mapping=None, **kwargs):
         """Add geographic map to the plot"""
         from .geom_map import geom_map
@@ -431,6 +467,11 @@ class ggplot:
         """Apply void theme (no axes, grid, or background)"""
         from .themes import theme_void
         return theme_void(**kwargs)._add_to_ggplot(self)
+
+    def theme_essi(self, **kwargs):
+        """Apply Essi theme (beige background, colorblind-safe palette)"""
+        from .themes import theme_essi
+        return theme_essi(**kwargs)._add_to_ggplot(self)
 
     # Method chaining for scales
     def scale_color_manual(self, **kwargs):

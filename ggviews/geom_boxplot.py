@@ -193,7 +193,16 @@ class geom_boxplot(GeomLayer):
         
         # Combine all elements
         if elements:
-            return hv.Overlay(elements)
+            overlay = hv.Overlay(elements)
+            # Set categorical x-axis tick labels when grouping variable exists
+            if x_col and x_col in data.columns:
+                group_names = sorted(data[x_col].unique())
+                xticks = [(i, str(name)) for i, name in enumerate(group_names)]
+                try:
+                    overlay = overlay.opts(xticks=xticks)
+                except Exception:
+                    pass
+            return overlay
         else:
             # Fallback empty plot
             return hv.Curve([]).opts(width=500, height=400)
